@@ -25,7 +25,6 @@ build: ## Build the application binary
 run: ## Start the development server
 	@echo "Starting My Dear Bug API server..."
 	@echo "API Server: http://localhost:8080"
-	@echo "API Documentation: http://localhost:8080/swagger/index.html"
 	go run main.go
 
 # Testing

@@ -31,7 +31,7 @@ func Load() *Config {
 
 	return &Config{
 		DBUrl:         os.Getenv("DATABASE_URL"),
-		ServerAddress: os.Getenv("SERVER_ADDR"),
+		ServerAddress: os.Getenv("PORT"),
 	}
 }
 
