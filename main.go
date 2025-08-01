@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/Balaji01-4D/my-dear-bug/config"
 	"github.com/Balaji01-4D/my-dear-bug/internals/bug"
 	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
@@ -16,5 +18,5 @@ func main() {
 	bug.RegisterRoutes(r, db)
 	upvote.RegisterRoutes(r, db)
 
-	r.Run(config.Load().ServerAddress)
+	r.Run(os.Getenv("PORT"))
 }
