@@ -2,19 +2,19 @@ package bug
 
 import "gorm.io/gorm"
 
-type Repo struct {
+type Repository struct {
 	DB *gorm.DB
 }
 
-func NewRepo(db *gorm.DB) *Repo  {
-	return &Repo{DB: db}
+func NewRepo(db *gorm.DB) *Repository {
+	return &Repository{DB: db}
 }
 
-func (r *Repo) Create(bug *Bug) error {
-	return  r.DB.Create(bug).Error
+func (r *Repository) Create(bug *Bug) error {
+	return r.DB.Create(bug).Error
 }
 
-func (r *Repo) ListAll(offset, limit int) ([]Bug, error) {
+func (r *Repository) ListAll(offset, limit int) ([]Bug, error) {
 	var out []Bug
 
 	err := r.DB.
@@ -26,3 +26,16 @@ func (r *Repo) ListAll(offset, limit int) ([]Bug, error) {
 	return out, err
 }
 
+func (r *Repository) Get(id uint) (Bug, error) {
+	var bug Bug
+
+	err := r.DB.Find(&bug, id).Error
+
+	return bug, err
+}
+
+func (r *Repository) Delete(id uint) error {
+	err := r.DB.Delete(&Bug{}, id).Error
+
+	return err
+}
