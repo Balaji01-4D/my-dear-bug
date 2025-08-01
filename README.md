@@ -7,12 +7,6 @@
     model.go
     repository.go
     dto.go
-  /comment/
-    handler.go
-    service.go
-    model.go
-    repository.go
-    dto.go
 /config/
     config.go
 /pkg/
