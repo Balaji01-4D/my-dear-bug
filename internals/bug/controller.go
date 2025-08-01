@@ -14,6 +14,8 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	service := NewService(repo)
 
 	bugs := r.Group("/bugs")
+
+
 	bugs.GET("", func(c *gin.Context) {
 		offest, _ := strconv.Atoi(c.Query("offset"))
 		limit, _ := strconv.Atoi(c.Query("limit"))
@@ -69,14 +71,45 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 		if err := service.Delete(uint(id)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error":err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"message":"successfully deleted",
+			"message": "successfully deleted",
 		})
+	})
+
+	bugs.GET("/language/:language", func(c *gin.Context) {
+		language := c.Param("language")
+		offest, _ := strconv.Atoi(c.Query("offset"))
+		limit, _ := strconv.Atoi(c.Query("limit"))
+
+		bugs, err := service.GetByLanguage(language, offest, limit)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to fetch",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, bugs)
+	})
+
+	bugs.GET("/top", func(c *gin.Context) {
+		offest, _ := strconv.Atoi(c.Query("offset"))
+		limit, _ := strconv.Atoi(c.Query("limit"))
+
+		bugs, err := service.GetTopBugs(offest, limit)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch bugs by rating"})
+			return
+		}
+
+		c.JSON(http.StatusOK, bugs)
 	})
 
 }
