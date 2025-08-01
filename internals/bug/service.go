@@ -18,6 +18,7 @@ func (s *Service) Create(dto CreateBugDTO) (Bug, error) {
 		Description: dto.Description,
 		Language: dto.Language,
 		Upvotes: 0,
+		Snippet: dto.Snippet ,
 		CreatedAt: now(),
 	}
 	err := s.repo.Create(&bug)

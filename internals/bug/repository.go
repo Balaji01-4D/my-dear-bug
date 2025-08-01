@@ -1,6 +1,8 @@
 package bug
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Repository struct {
 	DB *gorm.DB
@@ -22,6 +24,7 @@ func (r *Repository) ListAll(offset, limit int) ([]Bug, error) {
 		Limit(limit).
 		Order("created_at desc").
 		Find(&out).Error
+
 
 	return out, err
 }
