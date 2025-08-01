@@ -125,8 +125,13 @@ my-dear-bug/
    
    Create a `.env` file in the project root:
    ```env
-   DATABASE_URL=postgres://username:password@localhost:5432/mydearbug?sslmode=disable
-   SERVER_ADDR=:8080
+    DATABASE_URL=postgres://username:password@localhost:5432/mydearbug?sslmode=disable
+    SERVER_ADDR=:8080
+
+    # Admin Authentication
+    ADMIN_USERNAME=admin
+    ADMIN_PASSWORD=supersecret
+
    ```
 
 4. **Set up database**
