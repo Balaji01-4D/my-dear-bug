@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Balaji01-4D/my-dear-bug/internals/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -48,7 +49,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
-
 			return
 		}
 
@@ -62,6 +62,21 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		}
 
 		c.JSON(http.StatusOK, bug)
+	})
+
+	bugs.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
+		id, _ := strconv.Atoi(c.Param("id"))
+
+		if err := service.Delete(uint(id)); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message":"successfully deleted",
+		})
 	})
 
 }
