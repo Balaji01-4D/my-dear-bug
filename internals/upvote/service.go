@@ -11,16 +11,15 @@ type Service struct {
 	repo *Repository
 }
 
-func NewService(r *Repository) *Service{
+func NewService(r *Repository) *Service {
 	return &Service{repo: r}
 }
 
 func (s *Service) Upvote(bugId uint, ipHash string) error {
 
-
-	err :=  s.repo.Save(&Upvote{
-		BugID: bugId,
-		IPHash: ipHash,
+	err := s.repo.Save(&Upvote{
+		BugID:     bugId,
+		IPHash:    ipHash,
 		CreatedAt: time.Now(),
 	})
 
@@ -28,10 +27,9 @@ func (s *Service) Upvote(bugId uint, ipHash string) error {
 		return err
 	}
 
-
 	if err = s.repo.DB.Model(&bug.Bug{}).
-	Where("id = ?", bugId).
-	UpdateColumn("upvotes", gorm.Expr("upvotes + 1")).Error; err != nil {
+		Where("id = ?", bugId).
+		UpdateColumn("upvotes", gorm.Expr("upvotes + 1")).Error; err != nil {
 		return err
 	}
 

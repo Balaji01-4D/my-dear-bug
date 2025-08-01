@@ -1,12 +1,10 @@
 package config
 
 import (
-	"os"
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/Balaji01-4D/my-dear-bug/internals/bug"
-	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,13 +14,12 @@ type Config struct {
 	ServerAddress string
 }
 
-
 func LoadEnvVariables() {
 	err := godotenv.Load()
 
 	if err != nil {
 		log.Fatal("Error loading the .env files", err)
-		
+
 	}
 }
 
@@ -31,7 +28,7 @@ func init() {
 }
 
 func Load() *Config {
-	
+
 	return &Config{
 		DBUrl:         os.Getenv("DATABASE_URL"),
 		ServerAddress: os.Getenv("SERVER_ADDR"),

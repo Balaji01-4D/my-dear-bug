@@ -10,7 +10,6 @@ func init() {
 	config.LoadEnvVariables()
 }
 
-
 func main() {
 	cfg := config.Load()
 	db := config.InitDB(cfg)

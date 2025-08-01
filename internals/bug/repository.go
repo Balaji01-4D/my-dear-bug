@@ -25,7 +25,6 @@ func (r *Repository) ListAll(offset, limit int) ([]Bug, error) {
 		Order("created_at desc").
 		Find(&out).Error
 
-
 	return out, err
 }
 

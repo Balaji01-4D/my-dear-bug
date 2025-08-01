@@ -17,8 +17,6 @@ func (r *Repository) HasUpvoted(bugID uint, ipHash string) bool {
 	return err == nil
 }
 
-
-
 func (r *Repository) Save(upvote *Upvote) error {
 	return r.DB.Create(upvote).Error
 }

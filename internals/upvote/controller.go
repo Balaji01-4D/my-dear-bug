@@ -14,12 +14,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	repo := NewRepo(db)
 	svc := NewService(repo)
 
-
 	// upvote the bug
 	r.POST("/bugs/:id/upvote", func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 		ip := c.ClientIP()
-
 
 		hash := sha256.Sum256([]byte(ip))
 		ipHash := hex.EncodeToString(hash[:])
@@ -30,7 +28,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 		if err := svc.Upvote(uint(id), ipHash); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"message":"failed to upvote",
+				"message": "failed to upvote",
 			})
 			return
 		}
