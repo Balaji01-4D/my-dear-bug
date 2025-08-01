@@ -228,13 +228,12 @@ type Upvote struct {
 
 ### Available Commands
 ```bash
-make help          # Show all available commands
-make run           # Start the development server
-make build         # Build the application binary
-make test          # Run the test suite
-make clean         # Clean build artifacts
-make fmt           # Format Go code
-make lint          # Run code linting
+build                Build the application binary
+fmt                  Format Go code
+help                 Show all available commands
+install-deps         Install all Go dependencies
+run                  Start the development server
+test                 Run the test suite
 ```
 
 ### Development Workflow
