@@ -1,10 +1,12 @@
 package main
 
 import (
+	"time"
 	"github.com/Balaji01-4D/my-dear-bug/config"
 	"github.com/Balaji01-4D/my-dear-bug/internals/bug"
 	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 )
 
 func main() {
@@ -13,6 +15,14 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+	AllowOrigins:     []string{"http://localhost:5173"}, // or "*" for dev (not for prod)
+	AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
+	AllowHeaders:     []string{"Origin", "Content-Type"},
+	ExposeHeaders:    []string{"Content-Length"},
+	AllowCredentials: true,
+	MaxAge:           12 * time.Hour,
+	}))
 	bug.RegisterRoutes(r, db)
 	upvote.RegisterRoutes(r, db)
 
