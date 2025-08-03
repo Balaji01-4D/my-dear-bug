@@ -14,8 +14,7 @@ func AdminAuthMiddleware() gin.HandlerFunc {
 		user, pass, ok := c.Request.BasicAuth()
 		if !ok || user != username || pass != password {
 			c.Header("WWW-Authenticate", `Basic realm="Restricted"`)
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			c.Abort()
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
 		c.Next()

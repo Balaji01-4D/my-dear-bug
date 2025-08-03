@@ -1,5 +1,6 @@
 /.env
 /app
 /build
-/.github
 /frontend
+/.github
+dev*.go
