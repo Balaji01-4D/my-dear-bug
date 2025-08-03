@@ -44,7 +44,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, bug)
 	})
 
-	bugs.POST("", func(c *gin.Context) {
+	bugs.POST("", middleware.BugPostRateLimitMiddleWare(), func(c *gin.Context) {
 		var dto CreateBugDTO
 
 		if err := c.ShouldBindJSON(&dto); err != nil {
