@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Balaji01-4D/my-dear-bug/config"
-	"github.com/Balaji01-4D/my-dear-bug/internals/bug"
+	bug "github.com/Balaji01-4D/my-dear-bug/internals/confession"
 	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
 	"github.com/gin-gonic/gin"
 )

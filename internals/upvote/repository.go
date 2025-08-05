@@ -10,10 +10,10 @@ func NewRepo(db *gorm.DB) *Repository {
 	return &Repository{DB: db}
 }
 
-// Checks whether the user is already upvoted the bug
-func (r *Repository) HasUpvoted(bugID uint, ipHash string) bool {
+// Checks whether the user is already upvoted the confessions
+func (r *Repository) HasUpvoted(confessionID uint, ipHash string) bool {
 	var upvote Upvote
-	err := r.DB.Where("bug_id = ?", bugID).Where("ip_hash = ?", ipHash).First(&upvote).Error
+	err := r.DB.Where("confession_id = ?", confessionID).Where("ip_hash = ?", ipHash).First(&upvote).Error
 	return err == nil
 }
 

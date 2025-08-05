@@ -3,7 +3,7 @@ package upvote
 import (
 	"time"
 
-	"github.com/Balaji01-4D/my-dear-bug/internals/bug"
+	confession "github.com/Balaji01-4D/my-dear-bug/internals/confession"
 	"gorm.io/gorm"
 )
 
@@ -15,20 +15,20 @@ func NewService(r *Repository) *Service {
 	return &Service{repo: r}
 }
 
-func (s *Service) Upvote(bugId uint, ipHash string) error {
+func (s *Service) Upvote(confessionID uint, ipHash string) error {
 
 	err := s.repo.Save(&Upvote{
-		BugID:     bugId,
-		IPHash:    ipHash,
-		CreatedAt: time.Now(),
+		ConfessionID: confessionID,
+		IPHash:       ipHash,
+		CreatedAt:    time.Now(),
 	})
 
 	if err != nil {
 		return err
 	}
 
-	if err = s.repo.DB.Model(&bug.Bug{}).
-		Where("id = ?", bugId).
+	if err = s.repo.DB.Model(&confession.Confession{}).
+		Where("id = ?", confessionID).
 		UpdateColumn("upvotes", gorm.Expr("upvotes + 1")).Error; err != nil {
 		return err
 	}

@@ -10,16 +10,12 @@ import (
 )
 
 type Visitor struct {
-	limiter *rate.Limiter
+	limiter  *rate.Limiter
 	lastSeen time.Time
 }
 
-
-
-
 var visitors = make(map[string]*Visitor)
 var mu sync.Mutex
-
 
 // clear visitors for every ten minutes
 func init() {
@@ -45,26 +41,26 @@ func getVisitor(ip string) *rate.Limiter {
 	visitor, exists := visitors[ip]
 
 	if !exists {
-		limiter := rate.NewLimiter(10.0 / 3600.0, 3)	// 10 posts per hour	
+		limiter := rate.NewLimiter(10.0/3600.0, 3) // 10 posts per hour
 		visitors[ip] = &Visitor{limiter: limiter, lastSeen: time.Now()}
 		return limiter
 	}
 
 	visitor.lastSeen = time.Now()
-	return  visitor.limiter
+	return visitor.limiter
 }
 
-func BugPostRateLimitMiddleWare() gin.HandlerFunc {
-	return  func(c *gin.Context) {
+func PostRateLimitMiddleWare() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		ip := c.ClientIP()
 
 		limiter := getVisitor(ip)
 
-		if ! limiter.Allow() {
+		if !limiter.Allow() {
 			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
-				"error":"Too many requests - slow down",
+				"error": "Too many requests - slow down",
 			})
-			return 
+			return
 		}
 
 		c.Next()

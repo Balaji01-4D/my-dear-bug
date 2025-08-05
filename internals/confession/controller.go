@@ -1,4 +1,4 @@
-package bug
+package confession
 
 import (
 	"net/http"
@@ -13,26 +13,25 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	repo := NewRepo(db)
 	service := NewService(repo)
 
-	bugs := r.Group("/bugs")
+	Confessions := r.Group("/confessions")
 
-
-	bugs.GET("", func(c *gin.Context) {
+	Confessions.GET("", func(c *gin.Context) {
 		offest, _ := strconv.Atoi(c.Query("offset"))
 		limit, _ := strconv.Atoi(c.Query("limit"))
 
-		bugList, err := service.List(offest, limit)
+		confessionList, err := service.List(offest, limit)
 
 		if err != nil {
 			c.Status(http.StatusInternalServerError)
 			return
 		}
 
-		c.JSON(http.StatusOK, bugList)
+		c.JSON(http.StatusOK, confessionList)
 	})
 
-	bugs.GET("/:id", func(c *gin.Context) {
+	Confessions.GET("/:id", func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
-		bug, err := service.Get(uint(id))
+		confession, err := service.Get(uint(id))
 
 		if err != nil {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -41,11 +40,11 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			return
 		}
 
-		c.JSON(http.StatusOK, bug)
+		c.JSON(http.StatusOK, confession)
 	})
 
-	bugs.POST("", middleware.BugPostRateLimitMiddleWare(), func(c *gin.Context) {
-		var dto CreateBugDTO
+	Confessions.POST("", middleware.PostRateLimitMiddleWare(), func(c *gin.Context) {
+		var dto ConfessionRequest
 
 		if err := c.ShouldBindJSON(&dto); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -54,7 +53,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			return
 		}
 
-		bug, err := service.Create(dto)
+		confession, err := service.Create(dto)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -63,10 +62,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			return
 		}
 
-		c.JSON(http.StatusOK, bug)
+		c.JSON(http.StatusOK, confession)
 	})
 
-	bugs.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
+	Confessions.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 
 		if err := service.Delete(uint(id)); err != nil {
@@ -81,12 +80,12 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		})
 	})
 
-	bugs.GET("/language/:language", func(c *gin.Context) {
+	Confessions.GET("/language/:language", func(c *gin.Context) {
 		language := c.Param("language")
 		offest, _ := strconv.Atoi(c.Query("offset"))
 		limit, _ := strconv.Atoi(c.Query("limit"))
 
-		bugs, err := service.GetByLanguage(language, offest, limit)
+		confessions, err := service.GetByLanguage(language, offest, limit)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -95,21 +94,21 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			return
 		}
 
-		c.JSON(http.StatusOK, bugs)
+		c.JSON(http.StatusOK, confessions)
 	})
 
-	bugs.GET("/top", func(c *gin.Context) {
+	Confessions.GET("/top", func(c *gin.Context) {
 		offest, _ := strconv.Atoi(c.Query("offset"))
 		limit, _ := strconv.Atoi(c.Query("limit"))
 
-		bugs, err := service.GetTopBugs(offest, limit)
+		confessions, err := service.GetTopConfessions(offest, limit)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch bugs by rating"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch confession by rating"})
 			return
 		}
 
-		c.JSON(http.StatusOK, bugs)
+		c.JSON(http.StatusOK, confessions)
 	})
 
 }
