@@ -3,7 +3,7 @@ package confession
 import (
 	"time"
 
-	"github.com/lib/pq"
+	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
 )
 
 type Confession struct {
@@ -12,7 +12,7 @@ type Confession struct {
 	Description string         `gorm:"type:text" json:"description"`
 	Language    string         `gorm:"size:50" json:"language"`
 	Snippet     string         `gorm:"type:text" json:"snippet"`
-	Tags        pq.StringArray `gorm:"type:text[]" json:"tags"`
+	Tags 		[]tag.Tag 		`gorm:"many2many:confession_tags;" json:"tags"`
 	Sentiment   string         `gorm:"size:20" json:"sentiment"` // e.g., "positive", "negative", "neutral"
 	IsFlagged   bool           `gorm:"default:false" json:"isFlagged"`
 	CreatedAt   time.Time      `json:"createdAt"`

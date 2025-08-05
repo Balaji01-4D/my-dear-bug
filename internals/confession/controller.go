@@ -13,9 +13,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	repo := NewRepo(db)
 	service := NewService(repo)
 
-	Confessions := r.Group("/confessions")
+	confessionRoutes := r.Group("/confessions")
 
-	Confessions.GET("", func(c *gin.Context) {
+	confessionRoutes.GET("", func(c *gin.Context) {
 		offest, _ := strconv.Atoi(c.Query("offset"))
 		limit, _ := strconv.Atoi(c.Query("limit"))
 
@@ -29,7 +29,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, confessionList)
 	})
 
-	Confessions.GET("/:id", func(c *gin.Context) {
+	confessionRoutes.GET("/:id", func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 		confession, err := service.Get(uint(id))
 
@@ -43,7 +43,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, confession)
 	})
 
-	Confessions.POST("", middleware.PostRateLimitMiddleWare(), func(c *gin.Context) {
+	confessionRoutes.POST("", middleware.PostRateLimitMiddleWare(), func(c *gin.Context) {
 		var dto ConfessionRequest
 
 		if err := c.ShouldBindJSON(&dto); err != nil {
@@ -65,7 +65,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, confession)
 	})
 
-	Confessions.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
+	confessionRoutes.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 
 		if err := service.Delete(uint(id)); err != nil {
@@ -80,7 +80,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		})
 	})
 
-	Confessions.GET("/language/:language", func(c *gin.Context) {
+	confessionRoutes.GET("/language/:language", func(c *gin.Context) {
 		language := c.Param("language")
 		offest, _ := strconv.Atoi(c.Query("offset"))
 		limit, _ := strconv.Atoi(c.Query("limit"))
@@ -97,7 +97,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, confessions)
 	})
 
-	Confessions.GET("/top", func(c *gin.Context) {
+	confessionRoutes.GET("/top", func(c *gin.Context) {
 		offest, _ := strconv.Atoi(c.Query("offset"))
 		limit, _ := strconv.Atoi(c.Query("limit"))
 

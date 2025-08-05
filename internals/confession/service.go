@@ -1,6 +1,11 @@
 package confession
 
-import "time"
+import (
+	"strings"
+	"time"
+
+	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
+)
 
 type Service struct {
 	repo *Repository
@@ -18,12 +23,31 @@ func (s *Service) Create(dto ConfessionRequest) (Confession, error) {
 		Description: dto.Description,
 		Language:    dto.Language,
 		Snippet:     dto.Snippet,
-		Tags:        dto.Tags,
 		Sentiment:   "happy", // hardcoded for just now
 		IsFlagged:   dto.IsFlagged,
 		CreatedAt:   now(),
 		Upvotes:     0,
 	}
+
+	var tags []tag.Tag
+
+	for _, tagName := range dto.Tags {
+		tagName = strings.TrimSpace(strings.ToLower(tagName))
+		if tagName == "" {
+			continue
+		}
+		
+		tagService := tag.NewService((*tag.Repository)(s.repo)) // Create an instance of tag.Service
+		resultTag, err := tagService.GetTagByName(tagName)
+		if err != nil {
+			if err := s.repo.DB.Create(&resultTag).Error; err != nil {
+				return Confession{}, err
+			}
+		}
+		tags = append(tags, resultTag)
+	}
+	confession.Tags = tags
+
 
 	err := s.repo.Create(&confession)
 	return confession, err
