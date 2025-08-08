@@ -6,5 +6,5 @@ type ConfessionRequest struct {
 	Snippet     string   `json:"snippet" binding:"omitempty"`
 	Language    string   `json:"language" binding:"required"`
 	Tags        []string `json:"tags" binding:"omitempty,dive,min=1"`
-	IsFlagged   bool     `json:"isFlagged" binding:"required"`
+	IsFlagged   bool     `json:"isFlagged"`
 }
