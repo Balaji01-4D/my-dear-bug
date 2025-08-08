@@ -12,6 +12,7 @@ func (r *Repository) GetTopConfessions(offest int, limit int) ([]Confession, err
 	var confessions []Confession
 
 	err := r.DB.
+		Preload("Tags").
 		Offset(offest).
 		Limit(limit).
 		Order("upvoteS DESC").
@@ -45,21 +46,37 @@ func (r *Repository) List(offset, limit int) ([]Confession, error) {
 func (r *Repository) Get(id uint) (Confession, error) {
 	var confession Confession
 
-	err := r.DB.Find(&confession, id).Error
+	err := r.DB.Preload("Tags").First(&confession, id).Error
 
 	return confession, err
 }
 
 func (r *Repository) Delete(id uint) error {
-	err := r.DB.Delete(&Confession{}, id).Error
+	tx := r.DB.Begin()
+	if err := tx.Error; err != nil {
+		return err
+	}
 
-	return err
+	// Removing join rows first
+	if err := tx.Exec("DELETE FROM confession_tags WHERE confession_id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Now delete the confession
+	if err := tx.Delete(&Confession{}, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (r *Repository) GetByLanguage(language string, offset int, limit int) ([]Confession, error) {
 
 	var confessions []Confession
 	err := r.DB.
+		Preload("Tags").
 		Offset(offset).
 		Limit(limit).
 		Where("language ILIKE ?", language).
@@ -68,4 +85,3 @@ func (r *Repository) GetByLanguage(language string, offset int, limit int) ([]Co
 
 	return confessions, err
 }
-
