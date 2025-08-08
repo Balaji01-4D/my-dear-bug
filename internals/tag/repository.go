@@ -38,7 +38,25 @@ func (r *Repository) SuggestTags(query string) ([]Tag, error) {
 
 
 func (r *Repository) DeleteTags(id int) error {
-	return r.DB.Delete(&Tag{}, id).Error
+	tx := r.DB.Begin()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+		// Removing join rows first
+	if err := tx.Exec("DELETE FROM confession_tags WHERE tag_id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Now delete the tag
+	if err := tx.Delete(&Tag{}, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (r *Repository) GetTagByName(name string) (Tag, error) {
