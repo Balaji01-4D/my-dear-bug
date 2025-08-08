@@ -33,6 +33,7 @@ func (r *Repository) List(offset, limit int) ([]Confession, error) {
 	var out []Confession
 
 	err := r.DB.
+		Preload("Tags").
 		Offset(offset).
 		Limit(limit).
 		Order("created_at desc").
@@ -67,3 +68,4 @@ func (r *Repository) GetByLanguage(language string, offset int, limit int) ([]Co
 
 	return confessions, err
 }
+

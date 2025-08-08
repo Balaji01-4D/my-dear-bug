@@ -1,10 +1,13 @@
 package confession
 
 import (
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Service struct {
@@ -31,23 +34,42 @@ func (s *Service) Create(dto ConfessionRequest) (Confession, error) {
 
 	var tags []tag.Tag
 
+	// Deduplicate incoming tags
+	seen := make(map[string]struct{}, len(dto.Tags))
 	for _, tagName := range dto.Tags {
 		tagName = strings.TrimSpace(strings.ToLower(tagName))
 		if tagName == "" {
 			continue
 		}
-		
-		tagService := tag.NewService((*tag.Repository)(s.repo)) // Create an instance of tag.Service
-		resultTag, err := tagService.GetTagByName(tagName)
-		if err != nil {
-			if err := s.repo.DB.Create(&resultTag).Error; err != nil {
+		if _, ok := seen[tagName]; ok {
+			continue
+		}
+		seen[tagName] = struct{}{}
+	}
+
+	for tagName := range seen {
+		var t tag.Tag
+		// Try to find existing
+		if err := s.repo.DB.Where("name = ?", tagName).First(&t).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// Create if absent, ignoring conflict (atomic)
+				if err := s.repo.DB.Clauses(clause.OnConflict{
+					Columns:   []clause.Column{{Name: "name"}},
+					DoNothing: true,
+				}).Create(&tag.Tag{Name: tagName}).Error; err != nil {
+					return Confession{}, err
+				}
+				// Fetch the row (handles both created and conflicted cases)
+				if err := s.repo.DB.Where("name = ?", tagName).First(&t).Error; err != nil {
+					return Confession{}, err
+				}
+			} else {
 				return Confession{}, err
 			}
 		}
-		tags = append(tags, resultTag)
+		tags = append(tags, t)
 	}
 	confession.Tags = tags
-
 
 	err := s.repo.Create(&confession)
 	return confession, err
