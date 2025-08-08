@@ -1,6 +1,6 @@
 # 🐛 My Dear Bug
 
-> *A modern, lightweight bug tracking and community-driven debugging platform built with Go and Gin*
+> A modern, lightweight community-driven debugging platform built with Go and Gin
 
 [![Go Version](https://img.shields.io/badge/Go-1.24.2-blue.svg)](https://golang.org)
 [![Gin Framework](https://img.shields.io/badge/Gin-Web%20Framework-green.svg)](https://gin-gonic.com)
@@ -9,184 +9,139 @@
 
 ## Overview
 
-**My Dear Bug** is a community-driven platform where developers can share, discover, and collaboratively solve coding bugs. Whether you're stuck on a tricky algorithm, encountering unexpected behavior, or want to help others debug their code, this platform provides a clean, efficient way to connect with the developer community.
-
-### ✨ Key Features
-
-- **Bug Discovery**: Browse and search through a curated collection of real-world coding bugs
-- **Bug Submission**: Share your bugs with detailed descriptions and code snippets
-- **Community Voting**: Upvote the most interesting or critical bugs to prioritize them
-- **Language Filtering**: Filter bugs by programming language (Go, Python, JavaScript, etc.)
-- **Trending Bugs**: Discover the most popular and trending bugs in the community
-- **Admin Controls**: Secure administrative features for content moderation
-- **High Performance**: Built with Go and Gin for optimal speed and efficiency
-- **Robust Storage**: PostgreSQL database with GORM for reliable data persistence
+My Dear Bug is a community platform where developers share real-world issues ("confessions"), discover tricky bugs, and help each other debug. Submit a confession with details and code, upvote interesting ones, and explore by language or tags.
 
 ## Architecture
 
-### Clean Architecture Design
+Clean layered architecture with clear separation of concerns:
+
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Controllers   │───▶│    Services     │───▶│  Repositories   │
-│  (HTTP Layer)   │    │ (Business Logic)│    │  (Data Layer)   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│      DTOs       │    │     Models      │    │   PostgreSQL    │
-│ (Data Transfer) │    │  (Domain)       │    │   Database      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+Controllers → Services → Repositories → Database (PostgreSQL)
+            DTOs ↔ Models
 ```
 
 ### Project Structure
 ```
 my-dear-bug/
-├── config/                  # Configuration management
-│   └── config.go           # Database & environment setup
-├── internals/              # Core business logic
-│   ├── bug/                # Bug management domain
-│   │   ├── controller.go   # HTTP request handlers
-│   │   ├── service.go      # Business logic
-│   │   ├── repository.go   # Data access layer
-│   │   ├── model.go        # Bug data model
-│   │   └── dto.go          # Data transfer objects
-│   ├── upvote/             # Voting system domain
-│   │   ├── controller.go   # Upvote handlers
-│   │   ├── service.go      # Voting logic
-│   │   ├── repository.go   # Vote data access
-│   │   └── model.go        # Upvote data model
-│   └── middleware/         # HTTP middleware
-│       └── adminAuth.go    # Admin authentication
-├── migrate/                # Database migrations
-│   ├── migrate.go          # Migration runner
-│   └── init.sql            # Initial schema
-├── main.go                 # Application entry point
-├── go.mod                  # Go module definition
-└── Makefile                # Build automation
+├── config/                  # Configuration & DB setup
+│   ├── config.go            # Loads env (DATABASE_URL, PORT) & InitDB
+│   └── devConfig.go         # .env loader (godotenv) for local dev
+├── internals/
+│   ├── confession/          # Confession (bug report) domain
+│   │   ├── controller.go    # HTTP handlers (/confessions)
+│   │   ├── service.go       # Business logic
+│   │   ├── repository.go    # GORM queries (pagination, filters)
+│   │   ├── model.go         # Confession entity + relations
+│   │   └── dto.go           # Request validation
+│   ├── upvote/              # Upvote domain
+│   │   ├── controller.go    # POST /confessions/:id/upvote
+│   │   ├── service.go       # Upvote logic (+1 counter)
+│   │   ├── repository.go    # HasUpvoted + persist
+│   │   └── model.go         # Upvote entity
+│   ├── tag/                 # Tagging & suggestions
+│   │   ├── controller.go    # /tags endpoints
+│   │   ├── service.go
+│   │   ├── repository.go
+│   │   └── model.go         # Tag entity
+│   └── middleware/
+│       ├── adminAuth.go     # Basic auth for protected routes
+│       └── rateLimit.go     # Per-IP POST rate limiting
+├── migrate/
+│   ├── migrate.go           # GORM AutoMigrate
+│   └── init.sql             # (Legacy) SQL schema
+├── main.go                  # App entrypoint & route registration
+├── Makefile                 # build/run/test/fmt tasks
+├── go.mod / go.sum
+└── README.md
 ```
 
 ## Technology Stack
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **Backend** | Go 1.24.2 | High-performance server runtime |
-| **Web Framework** | Gin | Fast HTTP router and middleware |
-| **Database** | PostgreSQL | Reliable relational database |
-| **ORM** | GORM | Object-relational mapping |
-| **Configuration** | godotenv | Environment variable management |
-| **Build Tool** | Make | Build automation and task running |
+- Go + Gin web framework
+- PostgreSQL + GORM ORM
+- godotenv (local dev)
+- Make for developer tasks
 
 ## API Endpoints
 
-### Bug Management
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/bugs` | List all bugs with pagination | None |
-| `GET` | `/bugs/{id}` | Get specific bug details | None |
-| `POST` | `/bugs` | Submit a new bug report | None |
-| `DELETE` | `/bugs/{id}` | Delete a bug | Admin only |
+### Confession Management
+- GET  `/confessions` — List with pagination (offset, limit)
+- GET  `/confessions/:id` — Get details
+- POST `/confessions` — Create a confession (rate-limited per IP)
+- DELETE `/confessions/:id` — Delete (admin only)
 
 ### Filtering & Discovery
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/bugs/language/{language}` | Filter bugs by programming language |
-| `GET` | `/bugs/top` | Get highest-rated bugs |
+- GET `/confessions/language/:language` — Filter by language (case-insensitive)
+- GET `/confessions/top` — Highest upvoted confessions
 
 ### Community Voting
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/bugs/{id}/upvote` | Upvote a bug (IP-based deduplication) |
+- POST `/confessions/:id/upvote` — Upvote (deduplicated by IP hash)
+
+### Tags
+- GET `/tags` — List tags
+- POST `/tags` — Create tag
+- GET `/tags/suggest?query=<prefix>` — Autocomplete suggestions
+- DELETE `/tags/:id` — Delete tag (admin only)
 
 ### Query Parameters
-- `offset` - Skip number of records for pagination (default: 0)
-- `limit` - Maximum records to return (default: 10, max: 100)
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Go 1.24.2 or later
-- PostgreSQL database
-- Git
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Balaji01-4D/my-dear-bug.git
-   cd my-dear-bug
-   ```
-
-2. **Install dependencies**
-   ```bash
-   make install-deps
-   ```
-
-3. **Configure environment**
-   
-   Create a `.env` file in the project root:
-   ```env
-    DATABASE_URL=postgres://username:password@localhost:5432/mydearbug?sslmode=disable
-    SERVER_ADDR=:8080
-
-    # Admin Authentication
-    ADMIN_USERNAME=admin
-    ADMIN_PASSWORD=supersecret
-
-   ```
-
-4. **Set up database**
-   ```bash
-   # Run migrations
-   go run migrate/migrate.go
-   ```
-
-5. **Start the application**
-   ```bash
-   make run
-   ```
-
-   🎉 **Your API is now running at:** `http://localhost:8080`
+- `offset` — Pagination offset (default: 0 if omitted)
+- `limit` — Pagination limit (if omitted, no limit is applied by the DB layer)
 
 ## Usage Examples
 
-### Submit a Bug
+### Submit a Confession
 ```bash
-curl -X POST http://localhost:8080/bugs \
+curl -X POST http://localhost:8080/confessions \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Memory leak in Python list comprehension",
-    "description": "Nested list comprehensions cause excessive memory usage",
-    "snippet": "data = [[x*y for x in range(1000)] for y in range(1000)]",
-    "language": "python"
+    "title": "Deadlock Detected",
+    "description": "Two goroutines wait on each other causing deadlock",
+    "snippet": "mutex1.Lock(); mutex2.Lock();",
+    "language": "go",
+    "tags": ["concurrency", "mutex"]
   }'
 ```
 
-### Browse Bugs
+### Browse Confessions
 ```bash
-# Get all bugs with pagination
-curl "http://localhost:8080/bugs?limit=10&offset=0"
+# Get all with pagination
+curl "http://localhost:8080/confessions?limit=10&offset=0"
 
 # Filter by language
-curl "http://localhost:8080/bugs/language/go?limit=5"
+curl "http://localhost:8080/confessions/language/go?limit=5"
 
-# Get trending bugs
-curl "http://localhost:8080/bugs/top?limit=10"
+# Get trending
+curl "http://localhost:8080/confessions/top?limit=10"
 ```
 
-### Vote on Bugs
+### Vote on a Confession
 ```bash
-# Upvote a bug
-curl -X POST http://localhost:8080/bugs/1/upvote
+curl -X POST http://localhost:8080/confessions/1/upvote
 ```
 
-### Sample Response
+### Tag APIs
+```bash
+# List tags
+curl http://localhost:8080/tags
+
+# Create tag
+curl -X POST http://localhost:8080/tags -H 'Content-Type: application/json' -d '{"name": "performance"}'
+
+# Suggest tags (prefix search)
+curl "http://localhost:8080/tags/suggest?query=per"
+```
+
+### Sample Confession Response
 ```json
 {
   "id": 1,
   "title": "Deadlock Detected",
-  "description": "Deadlock occurs when two goroutines wait on each other.",
+  "description": "Two goroutines wait on each other.",
   "language": "go",
   "snippet": "mutex1.Lock(); mutex2.Lock();",
+  "tags": [{ "id": 3, "name": "concurrency" }],
+  "sentiment": "happy",
+  "isFlagged": false,
   "createdAt": "2025-08-01T15:05:58.156094+05:30",
   "upvotes": 15
 }
@@ -194,37 +149,77 @@ curl -X POST http://localhost:8080/bugs/1/upvote
 
 ## Data Models
 
-### Bug Entity
+### Confession
 ```go
-type Bug struct {
-    ID          uint      `json:"id"`
-    Title       string    `json:"title"`
-    Description string    `json:"description"`
-    Language    string    `json:"language"`
-    Snippet     string    `json:"snippet"`
-    CreatedAt   time.Time `json:"createdAt"`
-    Upvotes     int       `json:"upvotes"`
+type Confession struct {
+    ID          uint       `json:"id"`
+    Title       string     `json:"title"`
+    Description string     `json:"description"`
+    Language    string     `json:"language"`
+    Snippet     string     `json:"snippet"`
+    Tags        []tag.Tag  `json:"tags"`           // many2many: confession_tags
+    Sentiment   string     `json:"sentiment"`
+    IsFlagged   bool       `json:"isFlagged"`
+    CreatedAt   time.Time  `json:"createdAt"`
+    Upvotes     int        `json:"upvotes"`
 }
 ```
 
-### Upvote Entity
+### Upvote
 ```go
 type Upvote struct {
-    ID        uint      `json:"id"`
-    BugID     uint      `json:"bug_id"`
-    IPHash    string    `json:"-"`        // Privacy-protected
-    CreatedAt time.Time `json:"createdAt"`
+    ID           uint      `json:"id"`
+    ConfessionID uint      `json:"confessionId"`
+    IPHash       string    `json:"-"`           // privacy protected
+    CreatedAt    time.Time `json:"createdAt"`
 }
 ```
 
-## Security Features
+### Tag
+```go
+type Tag struct {
+    ID   uint   `json:"id"`
+    Name string `json:"name"` // unique
+}
+```
 
-- **IP-based Vote Deduplication**: Prevents spam voting using SHA-256 hashed IP addresses
-- **Admin Authentication**: Secure middleware for administrative operations
-- **Input Validation**: Comprehensive request validation using Gin's binding
-- **SQL Injection Protection**: GORM ORM provides built-in protection
+## Security & Middleware
+
+- IP-based upvote deduplication (SHA-256 hash of client IP)
+- Admin authentication (Basic Auth) for DELETE endpoints
+- Rate limiting: 10 POSTs/hour per IP (burst 3) on confession creation
 
 ## Development
+
+### Prerequisites
+- Go 1.24.2+
+- PostgreSQL
+- Git
+
+### Install & Run
+1) Install dependencies
+```bash
+make install-deps
+```
+
+2) Configure environment (.env)
+```env
+DATABASE_URL=postgres://username:password@localhost:5432/mydearbug?sslmode=disable
+PORT=:8080
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=supersecret
+```
+
+3) Run migrations
+```bash
+go run migrate/migrate.go
+```
+
+4) Start the API
+```bash
+make run
+```
+API: http://localhost:8080
 
 ### Available Commands
 ```bash
@@ -237,91 +232,43 @@ test                 Run the test suite
 ```
 
 ### Development Workflow
-1. Make your changes
-2. Run `make fmt` to format code
-3. Run `make test` to ensure tests pass
-4. Run `make run` to test locally
-5. Submit your pull request
+1. Make changes
+2. make fmt
+3. make test
+4. make run
+5. Open a PR
 
-## Contributing
+## Configuration Notes
 
-We welcome contributions! Here's how you can help:
-
-1. **Report Bugs**: Use the GitHub Issues tab
-2. **Suggest Features**: Open a feature request
-3. **Submit PRs**: Fork, branch, code, test, submit
-4. **Improve Docs**: Help us make documentation better
-
-### Contribution Guidelines
-- Follow Go best practices and conventions
-- Write tests for new features
-- Update documentation for API changes
-- Use meaningful commit messages
-
-## Deployment
-
-### Production Checklist
-- [ ] Set `GIN_MODE=release` in production
-- [ ] Use environment variables for sensitive data
-- [ ] Enable database connection pooling
-- [ ] Set up proper logging and monitoring
-- [ ] Configure reverse proxy (Nginx/Apache)
-- [ ] Enable HTTPS/TLS
-
-### Environment Variables
-```env
-DATABASE_URL=          # PostgreSQL connection string
-SERVER_ADDR=          # Server bind address (e.g., :8080)
-GIN_MODE=             # Gin mode (debug/release)
-```
-
-## Performance
-
-- **Fast Response Times**: Gin framework provides excellent performance
-- **Efficient Queries**: GORM with optimized database queries
-- **Pagination**: Built-in pagination for large datasets
-- **Connection Pooling**: PostgreSQL connection pooling for scalability
+- The server address is read from `PORT` (e.g., `:8080`)
+- Gin is started in release mode by default in `main.go`
+- Migrations use GORM AutoMigrate for `Confession` and `Upvote` (and will create tag relations)
 
 ## Testing
 
 ```bash
-# Run all tests
 make test
-
-# Run tests with coverage
+# with coverage
 go test -cover ./...
-
-# Run specific package tests
-go test ./internals/bug/
 ```
 
-## License
+## Deployment
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-- **Email**: support@mydearbug.com
-- **Issues**: [GitHub Issues](https://github.com/Balaji01-4D/my-dear-bug/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Balaji01-4D/my-dear-bug/discussions)
+- Set `PORT` appropriately for your environment
+- Use environment variables for secrets (no hardcoding)
+- Configure reverse proxy and TLS as needed
 
 ## Roadmap
 
-- [ ] User authentication and profiles
-- [ ] Email notifications for bug updates
-- [ ] Advanced search with filters
-- [ ] Mobile API endpoints
-- [ ] Integration with GitHub/GitLab
-- [ ] Analytics dashboard
-- [ ] REST API documentation with Swagger
-- [ ] Real-time updates with WebSockets
+- User authentication & profiles
+- Email notifications
+- Advanced search & filters
+- Mobile-friendly endpoints
+- Swagger/OpenAPI docs
+- Real-time updates (WebSockets)
 
 ---
 
 <div align="center">
-
-**Built with ❤️ by the My Dear Bug community**
-
-[⭐ Star this repo](https://github.com/Balaji01-4D/my-dear-bug) | [Report Bug](https://github.com/Balaji01-4D/my-dear-bug/issues) | [Request Feature](https://github.com/Balaji01-4D/my-dear-bug/issues)
-
+Built with ❤️ by the My Dear Bug community
 </div>
