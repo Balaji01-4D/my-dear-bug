@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Balaji01-4D/my-dear-bug/internals/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -74,16 +75,16 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		
 	})
 
-	tagRoutes.DELETE("/:id", func(c *gin.Context) {
+	tagRoutes.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 
 		if err := service.DeleteTags(id); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error":"unable to delete the tag"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to delete the tag"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message":"tag deleted successfully"})
-		
+		c.JSON(http.StatusOK, gin.H{"message": "tag deleted successfully"})
+
 	})
 	
 }
