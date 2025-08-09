@@ -3,11 +3,32 @@ package confession
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Balaji01-4D/my-dear-bug/internals/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
+
+const (
+	defaultLimit = 10
+	maxLimit     = 100
+)
+
+func parsePagination(c *gin.Context) (offset, limit int) {
+	offset, _ = strconv.Atoi(c.Query("offset"))
+	limit, _ = strconv.Atoi(c.Query("limit"))
+	if offset < 0 {
+		offset = 0
+	}
+	if limit <= 0 {
+		limit = defaultLimit
+	}
+	if limit > maxLimit {
+		limit = maxLimit
+	}
+	return
+}
 
 func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	repo := NewRepo(db)
@@ -16,104 +37,91 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	confessionRoutes := r.Group("/confessions")
 
 	confessionRoutes.GET("", func(c *gin.Context) {
-		offest, _ := strconv.Atoi(c.Query("offset"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
-
-		confessionList, err := service.List(offest, limit)
-
+		offset, limit := parsePagination(c)
+		list, err := service.List(offset, limit)
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list"})
 			return
 		}
-
-		c.JSON(http.StatusOK, confessionList)
+		c.JSON(http.StatusOK, list)
 	})
 
 	confessionRoutes.GET("/:id", func(c *gin.Context) {
-		id, _ := strconv.Atoi(c.Param("id"))
-		confession, err := service.Get(uint(id))
-
-		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "not found",
-			})
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil || id <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return
 		}
-
+		confession, err := service.Get(uint(id))
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch"})
+			return
+		}
 		c.JSON(http.StatusOK, confession)
 	})
 
 	confessionRoutes.POST("", middleware.PostRateLimitMiddleWare(), func(c *gin.Context) {
 		var dto ConfessionRequest
-
 		if err := c.ShouldBindJSON(&dto); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
 		confession, err := service.Create(dto)
-
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create"})
 			return
 		}
-
-		c.JSON(http.StatusOK, confession)
+		c.JSON(http.StatusCreated, confession)
 	})
 
 	confessionRoutes.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
-		id, _ := strconv.Atoi(c.Param("id"))
-
-		if err := service.Delete(uint(id)); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil || id <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 			return
 		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"message": "successfully deleted",
-		})
+		if err := service.Delete(uint(id)); err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "successfully deleted"})
 	})
 
 	confessionRoutes.GET("/language/:language", func(c *gin.Context) {
-		language := c.Param("language")
-		offest, _ := strconv.Atoi(c.Query("offset"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
-
-		confessions, err := service.GetByLanguage(language, offest, limit)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "failed to fetch",
-			})
+		language := strings.TrimSpace(c.Param("language"))
+		if language == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "language required"})
 			return
 		}
-
+		offset, limit := parsePagination(c)
+		confessions, err := service.GetByLanguage(language, offset, limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch"})
+			return
+		}
 		c.JSON(http.StatusOK, confessions)
 	})
 
 	confessionRoutes.GET("/top", func(c *gin.Context) {
-		offest, _ := strconv.Atoi(c.Query("offset"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
-
-		confessions, err := service.GetTopConfessions(offest, limit)
-
+		offset, limit := parsePagination(c)
+		confessions, err := service.GetTopConfessions(offset, limit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch confession by rating"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch"})
 			return
 		}
-
 		c.JSON(http.StatusOK, confessions)
 	})
 
 	confessionRoutes.GET("/trending/weekly", func(c *gin.Context) {
-		offset, _ := strconv.Atoi(c.Query("offset"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
+		offset, limit := parsePagination(c)
 		confessions, err := service.TrendingWeekly(offset, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
@@ -123,8 +131,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	})
 
 	confessionRoutes.GET("/trending/monthly", func(c *gin.Context) {
-		offset, _ := strconv.Atoi(c.Query("offset"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
+		offset, limit := parsePagination(c)
 		confessions, err := service.TrendingMonthly(offset, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
@@ -134,8 +141,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	})
 
 	confessionRoutes.GET("/hall-of-fame", func(c *gin.Context) {
-		offset, _ := strconv.Atoi(c.Query("offset"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
+		offset, limit := parsePagination(c)
 		confessions, err := service.HallOfFame(offset, limit)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
@@ -147,10 +153,26 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	confessionRoutes.GET("/random", func(c *gin.Context) {
 		cfs, err := service.Random()
 		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+				return
+			}
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
 			return
 		}
 		c.JSON(http.StatusOK, cfs)
 	})
 
+	confessionRoutes.GET("/search", func(c *gin.Context) {
+		q := strings.TrimSpace(c.Query("q"))
+		language := strings.TrimSpace(c.Query("language"))
+		tag := strings.TrimSpace(c.Query("tag"))
+		offset, limit := parsePagination(c)
+		results, err := service.Search(q, language, tag, offset, limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
+			return
+		}
+		c.JSON(http.StatusOK, results)
+	})
 }

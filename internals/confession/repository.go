@@ -1,6 +1,7 @@
 package confession
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -10,12 +11,12 @@ type Repository struct {
 	DB *gorm.DB
 }
 
-func (r *Repository) GetTopConfessions(offest int, limit int) ([]Confession, error) {
+func (r *Repository) GetTopConfessions(offset int, limit int) ([]Confession, error) { // renamed param
 	var confessions []Confession
 
 	err := r.DB.
 		Preload("Tags").
-		Offset(offest).
+		Offset(offset).
 		Limit(limit).
 		Order("upvotes DESC").
 		Find(&confessions).Error
@@ -90,23 +91,26 @@ func (r *Repository) Delete(id uint) error {
 		return err
 	}
 
-	// Removing join rows first
+	// Removing join rows first (ignore if none)
 	if err := tx.Exec("DELETE FROM confession_tags WHERE confession_id = ?", id).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	// Now delete the confession
-	if err := tx.Delete(&Confession{}, id).Error; err != nil {
+	res := tx.Delete(&Confession{}, id)
+	if res.Error != nil {
 		tx.Rollback()
-		return err
+		return res.Error
+	}
+	if res.RowsAffected == 0 { // not found
+		tx.Rollback()
+		return gorm.ErrRecordNotFound
 	}
 
 	return tx.Commit().Error
 }
 
 func (r *Repository) GetByLanguage(language string, offset int, limit int) ([]Confession, error) {
-
 	var confessions []Confession
 	err := r.DB.
 		Preload("Tags").
@@ -118,3 +122,35 @@ func (r *Repository) GetByLanguage(language string, offset int, limit int) ([]Co
 
 	return confessions, err
 }
+
+// Search supports filtering by free text (title/description/snippet), language and a single tag name.
+func (r *Repository) Search(q, language, tag string, offset, limit int) ([]Confession, error) {
+	var confessions []Confession
+	db := r.DB.Model(&Confession{}).Preload("Tags")
+
+	if tag != "" {
+		// join tags for filtering; distinct to avoid duplicates
+		db = db.Joins("JOIN confession_tags ct ON ct.confession_id = confessions.id").
+			Joins("JOIN tags ON tags.id = ct.tag_id").
+			Where("tags.name ILIKE ?", tag)
+	}
+
+	if language != "" {
+		db = db.Where("language ILIKE ?", language)
+	}
+
+	if q != "" {
+		like := "%" + q + "%"
+		db = db.Where("(title ILIKE ? OR description ILIKE ? OR snippet ILIKE ?)", like, like, like)
+	}
+
+	err := db.Distinct().
+		Offset(offset).
+		Limit(limit).
+		Order("created_at DESC").
+		Find(&confessions).Error
+	return confessions, err
+}
+
+// Helper to map not found errors (used optionally by services)
+func isNotFound(err error) bool { return errors.Is(err, gorm.ErrRecordNotFound) }

@@ -95,8 +95,8 @@ func (s *Service) GetByLanguage(language string, offset int, limit int) ([]Confe
 	return s.repo.GetByLanguage(language, offset, limit)
 }
 
-func (s *Service) GetTopConfessions(offest int, limit int) ([]Confession, error) {
-	return s.repo.GetTopConfessions(offest, limit)
+func (s *Service) GetTopConfessions(offset int, limit int) ([]Confession, error) {
+	return s.repo.GetTopConfessions(offset, limit)
 }
 
 func (s *Service) TrendingWeekly(offset, limit int) ([]Confession, error) {
@@ -115,6 +115,11 @@ func (s *Service) HallOfFame(offset, limit int) ([]Confession, error) {
 
 func (s *Service) Random() (Confession, error) {
 	return s.repo.RandomConfession()
+}
+
+// Search confessions by free text / language / tag
+func (s *Service) Search(q, language, tag string, offset, limit int) ([]Confession, error) {
+	return s.repo.Search(q, language, tag, offset, limit)
 }
 
 func now() time.Time {
