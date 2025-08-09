@@ -73,6 +73,10 @@ my-dear-bug/
 ### Filtering & Discovery
 - GET `/confessions/language/:language` — Filter by language (case-insensitive)
 - GET `/confessions/top` — Highest upvoted confessions
+- GET `/confessions/trending/weekly` — Trending confessions for the last 7 days
+- GET `/confessions/trending/monthly` — Trending confessions for the last 30 days
+- GET `/confessions/hall-of-fame` — All-time notable (e.g. high-impact) confessions
+- GET `/confessions/random` — Random selection (use for inspiration / shuffle)
 
 ### Community Voting
 - POST `/confessions/:id/upvote` — Upvote (deduplicated by IP hash)
@@ -110,8 +114,20 @@ curl "http://localhost:8080/confessions?limit=10&offset=0"
 # Filter by language
 curl "http://localhost:8080/confessions/language/go?limit=5"
 
-# Get trending
+# Highest upvoted
 curl "http://localhost:8080/confessions/top?limit=10"
+
+# Trending this week
+curl "http://localhost:8080/confessions/trending/weekly?limit=10"
+
+# Trending this month
+curl "http://localhost:8080/confessions/trending/monthly?limit=10"
+
+# Hall of fame
+curl "http://localhost:8080/confessions/hall-of-fame?limit=10"
+
+# Random selection
+curl "http://localhost:8080/confessions/random"
 ```
 
 ### Vote on a Confession
