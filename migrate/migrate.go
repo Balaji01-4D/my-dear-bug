@@ -3,12 +3,13 @@ package main
 import (
 	"github.com/Balaji01-4D/my-dear-bug/config"
 	confession "github.com/Balaji01-4D/my-dear-bug/internals/confession"
+	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
 	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
 )
 
-// func init() {
-// 	config.LoadEnvVariables()
-// }
+func init() {
+	config.LoadEnvVariables()
+}
 
 func main() {
 	cfg := config.Load()
@@ -16,4 +17,5 @@ func main() {
 
 	db.AutoMigrate(&confession.Confession{})
 	db.AutoMigrate(&upvote.Upvote{})
+	db.AutoMigrate(&tag.Tag{})
 }
