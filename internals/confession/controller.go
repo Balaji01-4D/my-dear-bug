@@ -111,4 +111,46 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, confessions)
 	})
 
+	confessionRoutes.GET("/trending/weekly", func(c *gin.Context) {
+		offset, _ := strconv.Atoi(c.Query("offset"))
+		limit, _ := strconv.Atoi(c.Query("limit"))
+		confessions, err := service.TrendingWeekly(offset, limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
+			return
+		}
+		c.JSON(http.StatusOK, confessions)
+	})
+
+	confessionRoutes.GET("/trending/monthly", func(c *gin.Context) {
+		offset, _ := strconv.Atoi(c.Query("offset"))
+		limit, _ := strconv.Atoi(c.Query("limit"))
+		confessions, err := service.TrendingMonthly(offset, limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
+			return
+		}
+		c.JSON(http.StatusOK, confessions)
+	})
+
+	confessionRoutes.GET("/hall-of-fame", func(c *gin.Context) {
+		offset, _ := strconv.Atoi(c.Query("offset"))
+		limit, _ := strconv.Atoi(c.Query("limit"))
+		confessions, err := service.HallOfFame(offset, limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
+			return
+		}
+		c.JSON(http.StatusOK, confessions)
+	})
+
+	confessionRoutes.GET("/random", func(c *gin.Context) {
+		cfs, err := service.Random()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed"})
+			return
+		}
+		c.JSON(http.StatusOK, cfs)
+	})
+
 }

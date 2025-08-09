@@ -1,6 +1,8 @@
 package confession
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -15,11 +17,42 @@ func (r *Repository) GetTopConfessions(offest int, limit int) ([]Confession, err
 		Preload("Tags").
 		Offset(offest).
 		Limit(limit).
-		Order("upvoteS DESC").
+		Order("upvotes DESC").
 		Find(&confessions).Error
 
 	return confessions, err
+}
 
+// GetTopConfessionsSince returns top confessions since a given time (weekly/monthly trending)
+func (r *Repository) GetTopConfessionsSince(since time.Time, offset int, limit int) ([]Confession, error) {
+	var confessions []Confession
+	err := r.DB.
+		Preload("Tags").
+		Where("created_at >= ?", since).
+		Offset(offset).
+		Limit(limit).
+		Order("upvotes DESC").
+		Find(&confessions).Error
+	return confessions, err
+}
+
+// HallOfFame returns all‑time top confessions (larger limit by caller) - could add thresholds later
+func (r *Repository) HallOfFame(offset, limit int) ([]Confession, error) {
+	var confessions []Confession
+	err := r.DB.
+		Preload("Tags").
+		Offset(offset).
+		Limit(limit).
+		Order("upvotes DESC").
+		Find(&confessions).Error
+	return confessions, err
+}
+
+// RandomConfession returns a single random confession (PostgreSQL RANDOM())
+func (r *Repository) RandomConfession() (Confession, error) {
+	var c Confession
+	err := r.DB.Preload("Tags").Order("RANDOM()").Limit(1).First(&c).Error
+	return c, err
 }
 
 func NewRepo(db *gorm.DB) *Repository {

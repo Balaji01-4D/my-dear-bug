@@ -99,6 +99,24 @@ func (s *Service) GetTopConfessions(offest int, limit int) ([]Confession, error)
 	return s.repo.GetTopConfessions(offest, limit)
 }
 
+func (s *Service) TrendingWeekly(offset, limit int) ([]Confession, error) {
+	weekAgo := now().AddDate(0, 0, -7)
+	return s.repo.GetTopConfessionsSince(weekAgo, offset, limit)
+}
+
+func (s *Service) TrendingMonthly(offset, limit int) ([]Confession, error) {
+	monthAgo := now().AddDate(0, -1, 0)
+	return s.repo.GetTopConfessionsSince(monthAgo, offset, limit)
+}
+
+func (s *Service) HallOfFame(offset, limit int) ([]Confession, error) {
+	return s.repo.HallOfFame(offset, limit)
+}
+
+func (s *Service) Random() (Confession, error) {
+	return s.repo.RandomConfession()
+}
+
 func now() time.Time {
 	return time.Now()
 }
