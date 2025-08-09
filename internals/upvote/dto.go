@@ -1,5 +1,5 @@
 package upvote
 
 type UpvoteDTO struct {
-	BugID uint `json:"bug_id" binding:"required"`
+	ConfessionID uint `json:"confessionId" binding:"required"`
 }

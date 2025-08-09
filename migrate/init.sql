@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS bugs (
+CREATE TABLE IF NOT EXISTS confessions (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS bugs (
 
 CREATE TABLE upvotes (
     id SERIAL PRIMARY KEY,
-    bug_id INT REFERENCES bugs(id),
+    confessions_id INT REFERENCES confessions(id),
     ip_hash TEXT,
     created_at TIMESTAMP DEFAULT NOW()
 );

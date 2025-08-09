@@ -14,8 +14,8 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	repo := NewRepo(db)
 	svc := NewService(repo)
 
-	// upvote the bug
-	r.POST("/bugs/:id/upvote", func(c *gin.Context) {
+	// upvote the confession
+	r.POST("/confessions/:id/upvote", func(c *gin.Context) {
 		id, _ := strconv.Atoi(c.Param("id"))
 		ip := c.ClientIP()
 

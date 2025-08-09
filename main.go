@@ -3,7 +3,8 @@ package main
 import (
 	"time"
 	"github.com/Balaji01-4D/my-dear-bug/config"
-	"github.com/Balaji01-4D/my-dear-bug/internals/bug"
+	bug "github.com/Balaji01-4D/my-dear-bug/internals/confession"
+	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
 	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
@@ -25,6 +26,7 @@ func main() {
 	}))
 	bug.RegisterRoutes(r, db)
 	upvote.RegisterRoutes(r, db)
+	tag.RegisterRoutes(r, db)
 
 	r.Run()
 }
