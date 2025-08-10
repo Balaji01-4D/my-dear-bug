@@ -4,3 +4,4 @@
 /frontend
 /.github
 dev*.go
+.vscode
