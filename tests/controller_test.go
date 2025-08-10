@@ -463,11 +463,8 @@ func TestListConfessions_Pagination(t *testing.T) {
 		t.Fatalf("expected 1 item on second page, got %d", len(secondPage))
 	}
 }
-
-/* ---------- Helpers ---------- */
-
-// jsonNumber formats a uint as a JSON-friendly string for URL paths
 func jsonNumber(id uint) string {
 	b, _ := json.Marshal(id)
 	return string(bytes.Trim(b, "\""))
+
 }
