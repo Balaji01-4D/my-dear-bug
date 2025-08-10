@@ -123,13 +123,12 @@ func (r *Repository) GetByLanguage(language string, offset int, limit int) ([]Co
 	return confessions, err
 }
 
-// Search supports filtering by free text (title/description/snippet), language and a single tag name.
 func (r *Repository) Search(q, language, tag string, offset, limit int) ([]Confession, error) {
 	var confessions []Confession
 	db := r.DB.Model(&Confession{}).Preload("Tags")
 
 	if tag != "" {
-		// join tags for filtering; distinct to avoid duplicates
+
 		db = db.Joins("JOIN confession_tags ct ON ct.confession_id = confessions.id").
 			Joins("JOIN tags ON tags.id = ct.tag_id").
 			Where("tags.name ILIKE ?", tag)
@@ -152,5 +151,5 @@ func (r *Repository) Search(q, language, tag string, offset, limit int) ([]Confe
 	return confessions, err
 }
 
-// Helper to map not found errors (used optionally by services)
+
 func isNotFound(err error) bool { return errors.Is(err, gorm.ErrRecordNotFound) }
