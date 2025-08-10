@@ -17,7 +17,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-	AllowOrigins:     []string{"http://localhost:5173"}, // or "*" for dev (not for prod)
+	AllowOrigins:     []string{"*"}, // or "*" for dev (not for prod)
 	AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
 	AllowHeaders:     []string{"Origin", "Content-Type"},
 	ExposeHeaders:    []string{"Content-Length"},
