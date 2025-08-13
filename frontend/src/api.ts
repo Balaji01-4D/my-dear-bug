@@ -1,4 +1,4 @@
-import type { Confession } from './types'
+import type { Confession, ConfessionRequest } from './types'
 
 const withParams = (base: string, params?: Record<string, string | number | undefined>) => {
   const url = new URL(base, window.location.origin)
@@ -26,5 +26,26 @@ export async function fetchTopConfessions(limit = 6) {
 export async function fetchRandom() {
   const res = await fetch('/confessions/random')
   if (!res.ok) throw new Error('Failed to fetch random confession')
+  return (await res.json()) as Confession
+}
+
+export async function createConfession(payload: ConfessionRequest) {
+  const res = await fetch('/confessions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    let msg = 'Failed to create confession'
+    try { const data = await res.json(); if (data?.error) msg = data.error } catch {}
+    throw new Error(msg)
+  }
+  return (await res.json()) as Confession
+}
+
+export async function fetchConfession(id: number) {
+  const res = await fetch(`/confessions/${id}`)
+  if (res.status === 404) throw new Error('Confession not found')
+  if (!res.ok) throw new Error('Failed to fetch confession')
   return (await res.json()) as Confession
 }

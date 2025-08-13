@@ -10,7 +10,7 @@ export function Navbar({ onSearchSelect }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-neutral-200">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
         {/* Logo */}
         <a href="#" className="text-2xl font-extrabold tracking-tight text-black mr-1">W.</a>
 
@@ -31,9 +31,9 @@ export function Navbar({ onSearchSelect }: Props) {
           <span className="inline-block w-16" aria-hidden="true"></span>
         </nav>
 
-        {/* Search */}
-    <div className="flex-1 flex justify-center">
-          <div className="w-full max-w-xl relative">
+        {/* Centered Search */}
+        <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-xl">
+          <div className="relative">
             <input
               ref={inputRef}
               onFocus={()=>setOpen(true)}
@@ -44,13 +44,13 @@ export function Navbar({ onSearchSelect }: Props) {
           </div>
         </div>
 
-        {/* Auth + CTA */}
-        <div className="ml-auto flex items-center gap-3 text-[15px]">
+        {/* Right actions */}
+        <div className="ml-auto hidden sm:flex items-center gap-3 text-[15px]">
           <a
             href="https://github.com/balaji01-4d/my-dear-bug"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-black text-white hover:bg-black/90"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-black text-white hover:bg-black/90"
             aria-label="Open GitHub repository"
           >
             <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="currentColor">

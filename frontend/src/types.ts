@@ -15,3 +15,12 @@ export type Confession = {
   createdAt: string
   upvotes: number
 }
+
+export type ConfessionRequest = {
+  title: string
+  description: string
+  snippet?: string
+  language: string
+  tags?: string[]
+  isFlagged?: boolean
+}
