@@ -1,0 +1,59 @@
+/* Scoped Monokai-like theme for Prism under .theme-monokai wrapper */
+.theme-monokai pre[class*="language-"], .theme-monokai code[class*="language-"] {
+  color: #f8f8f2;
+  /* use translucent dark background to feel lighter on white theme */
+  background: rgba(39, 40, 34, 0.86);
+  text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.theme-monokai pre[class*="language-"] {
+  border-radius: 14px;
+  border: 1px solid rgba(17, 24, 39, 0.24); /* neutral border to match cards */
+  backdrop-filter: saturate(110%) contrast(105%);
+}
+
+.theme-monokai .token.comment,
+.theme-monokai .token.prolog,
+.theme-monokai .token.doctype,
+.theme-monokai .token.cdata { color: #75715e; }
+
+.theme-monokai .token.punctuation { color: #f8f8f2; }
+.theme-monokai .token.namespace { opacity: .7; }
+
+.theme-monokai .token.property,
+.theme-monokai .token.tag,
+.theme-monokai .token.constant,
+.theme-monokai .token.symbol,
+.theme-monokai .token.deleted { color: #f92672; }
+
+.theme-monokai .token.boolean,
+.theme-monokai .token.number { color: #ae81ff; }
+
+.theme-monokai .token.selector,
+.theme-monokai .token.attr-name,
+.theme-monokai .token.string,
+.theme-monokai .token.char,
+.theme-monokai .token.builtin,
+.theme-monokai .token.inserted { color: #a6e22e; }
+
+.theme-monokai .token.operator,
+.theme-monokai .token.entity,
+.theme-monokai .token.url,
+.theme-monokai .language-css .token.string,
+.theme-monokai .style .token.string,
+.theme-monokai .token.variable { color: #f8f8f2; }
+
+.theme-monokai .token.atrule,
+.theme-monokai .token.attr-value,
+.theme-monokai .token.function,
+.theme-monokai .token.class-name { color: #e6db74; }
+
+.theme-monokai .token.keyword { color: #66d9ef; }
+
+.theme-monokai .token.regex,
+.theme-monokai .token.important { color: #fd971f; }
+
+.theme-monokai .token.important,
+.theme-monokai .token.bold { font-weight: bold; }
+.theme-monokai .token.italic { font-style: italic; }
+.theme-monokai .token.entity { cursor: help; }
