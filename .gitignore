@@ -5,3 +5,5 @@
 /.github
 dev*.go
 .vscode
+app.yaml
+dist
