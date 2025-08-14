@@ -41,14 +41,14 @@ export function HomePage() {
 
       {/* Hero */}
       <section className="hero-gradient border-b border-neutral-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-10 items-center">
+  <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-24 grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
           <div>
             <span className="inline-flex items-center text-xs uppercase tracking-widest text-neutral-500">Site of the Day</span>
-            <h1 className="mt-3 text-6xl sm:text-7xl font-extrabold leading-[1.05]">
+            <h1 className="mt-3 text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05]">
               METAMASK
             </h1>
-            <p className="mt-4 text-neutral-700 text-lg max-w-prose">Antinomy Studio • Aug 13, 2025 • Score 7.39 of 10</p>
-            <div className="mt-6 flex gap-3">
+            <p className="mt-3 sm:mt-4 text-neutral-700 text-base sm:text-lg max-w-prose">Antinomy Studio • Aug 13, 2025 • Score 7.39 of 10</p>
+            <div className="mt-5 sm:mt-6 flex flex-wrap gap-3">
               <a href="#discover" className="px-4 py-2 rounded-lg bg-black text-white font-medium">Explore</a>
               <a href="#" className="px-4 py-2 rounded-lg border border-neutral-300">Submit a confession</a>
             </div>
@@ -69,12 +69,12 @@ export function HomePage() {
       </section>
 
       {/* Nominees (limit 2) */}
-      <section className="py-12 bg-neutral-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <section className="py-10 sm:py-12 bg-neutral-100">
+  <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <div className="text-sm text-neutral-600 mb-3">Latest</div>
-            <h2 className="text-[48px] md:text-[80px] leading-none font-extrabold tracking-tight">NOMINEES</h2>
-            <p className="text-neutral-600 mt-4">Vote for the latest confessions on My Dear Bug</p>
+    <h2 className="text-[36px] sm:text-[48px] md:text-[80px] leading-none font-extrabold tracking-tight">NOMINEES</h2>
+    <p className="text-neutral-600 mt-2 sm:mt-4">Vote for the latest confessions on My Dear Bug</p>
           </div>
           <Nominees />
         </div>
@@ -82,7 +82,7 @@ export function HomePage() {
 
       {/* Discover section */}
       <Section id="discover" title="Recent confessions of the day" subtitle="Fresh community confessions across languages.">
-        <div className="grid md:grid-cols-2 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
           {latest.loading && Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-64 rounded-2xl bg-white border border-neutral-200 animate-pulse" />
           ))}
@@ -98,7 +98,7 @@ export function HomePage() {
 
       {/* Top section */}
       <Section id="top" title="Top confessions" subtitle="Most upvoted this week.">
-        <div className="grid md:grid-cols-2 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
           {top.loading && Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-64 rounded-2xl bg-white border border-neutral-200 animate-pulse" />
           ))}
@@ -112,8 +112,8 @@ export function HomePage() {
       </Section>
 
       {/* Footer cta */}
-      <section className="py-16 border-t border-neutral-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-6">
+      <section className="py-12 sm:py-16 border-t border-neutral-200 bg-white">
+  <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
           <div className="rounded-2xl p-8 bg-neutral-50 border border-neutral-200">
             <h3 className="text-xl font-semibold">Submit your confession for visibility and recognition</h3>
             <p className="text-neutral-600 mt-2">Get featured on the home page and help others squash bugs faster.</p>

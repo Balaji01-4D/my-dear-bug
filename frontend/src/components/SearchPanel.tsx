@@ -36,11 +36,11 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
 
   return (
     <div className="fixed inset-x-0 top-16 z-50">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+  <div className="mx-auto max-w-6xl px-3 sm:px-6 lg:px-8">
         <div className="rounded-2xl bg-neutral-100 border border-neutral-200 shadow-2xl">
-          <div className="grid grid-cols-12 gap-6 p-3 sm:p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 p-2 sm:p-4 max-h-[70vh] overflow-hidden">
             {/* Left rail */}
-            <div className="col-span-3 pr-2 border-r border-neutral-200">
+            <div className="sm:col-span-3 sm:pr-2 sm:border-r sm:border-neutral-200">
               <RailButton active={active==='trending'} onClick={()=>setActive('trending')} icon={<span className="text-neutral-700">↻</span>}>
                 Trending
               </RailButton>
@@ -56,7 +56,7 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
             </div>
 
             {/* Content */}
-            <div className="col-span-9">
+            <div className="sm:col-span-9 min-h-0 overflow-y-auto pr-1">
               {active === 'trending' && (
                 <TwoColList>
                   {(top.data ?? []).map(item => (
@@ -94,8 +94,8 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
           </div>
         </div>
       </div>
-      {/* backdrop */}
-      <div className="fixed inset-0 -z-10" onClick={onClose} />
+  {/* backdrop */}
+  <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
     </div>
   )
 }
@@ -111,7 +111,7 @@ function RailButton({ active, onClick, icon, children }: { active?: boolean; onC
 
 function TwoColList({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-3 p-1">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 p-1">
       {children}
     </div>
   )

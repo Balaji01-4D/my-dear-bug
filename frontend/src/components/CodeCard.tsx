@@ -46,14 +46,14 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
 
   return (
     <article
-      className={clsx('code-card group rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 transition-colors shadow-soft cursor-pointer', className)}
+      className={clsx('code-card group rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 transition-colors shadow-soft cursor-pointer focus:outline-none focus:ring-2 focus:ring-black/30', className)}
       onClick={() => navigate(`/c/confessions/${item.id}`)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/c/confessions/${item.id}`) } }}
       aria-label={`Open confession ${item.title}`}
     >
-      <div className="p-5">
+  <div className="p-4 sm:p-5">
         <div className="relative">
           {/* Language badge */}
           <div className="absolute left-3 top-3 z-10 inline-flex items-center gap-2 rounded-full bg-black/55 px-3 py-1 text-xs font-medium text-white backdrop-blur border border-white/10 shadow-sm">
@@ -62,10 +62,10 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
           </div>
           {/* Upvote count moved near title */}
           {/* Code area (fixed height + fade) */}
-          <div className="rounded-xl bg-neutral-200 p-3 relative">
+          <div className="rounded-xl bg-neutral-200 p-2.5 sm:p-3 relative">
             <pre
               className={clsx(languageClass)}
-              style={{ minHeight, maxHeight: minHeight, overflow: 'hidden', background: 'transparent' }}
+        style={{ minHeight, maxHeight: minHeight, overflow: 'hidden', background: 'transparent' }}
             >
               <code className={languageClass}>{item.snippet}</code>
             </pre>
@@ -80,7 +80,7 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
           </div>
         </div>
         {/* Title + upvote button + description */}
-        <div className="mt-4 flex items-start justify-between gap-3">
+  <div className="mt-3 sm:mt-4 flex items-start justify-between gap-3">
           <h3 className="text-black font-semibold leading-snug line-clamp-2 flex-1">{item.title}</h3>
           <button
             onClick={(e) => { e.stopPropagation(); handleUpvote() }}
@@ -98,7 +98,7 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
         )}
         {/* Tags */}
         {showTags && (
-          <div className="mt-3 flex flex-wrap gap-2 text-xs text-neutral-600">
+          <div className="mt-2 sm:mt-3 flex flex-wrap gap-1.5 sm:gap-2 text-xs text-neutral-600">
             {item.tags?.slice(0, 3).map(t => (
               <span key={t.id} className="px-2 py-0.5 rounded bg-neutral-100 border border-neutral-200">#{t.name}</span>
             ))}

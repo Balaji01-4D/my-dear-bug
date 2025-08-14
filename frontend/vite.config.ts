@@ -12,8 +12,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/confessions': 'http://localhost:8080',
-      '/tags': 'http://localhost:8080'
+      '/confessions': 'https://go-rest-api-469015.as.r.appspot.com/',
+      '/tags': 'https://go-rest-api-469015.as.r.appspot.com/'
     }
   }
 })

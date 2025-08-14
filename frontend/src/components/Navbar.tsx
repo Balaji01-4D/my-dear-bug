@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { navigate } from '@/navigation'
 import { SearchPanel } from '@/components/SearchPanel'
 
 type Props = {
@@ -9,8 +10,8 @@ export function Navbar({ onSearchSelect }: Props) {
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-neutral-200">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
+    <header className="site-header sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-neutral-200">
+      <div className="relative mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 h-16 flex items-center gap-3">
         {/* Logo */}
         <a href="#" className="text-2xl font-extrabold tracking-tight text-black mr-1">W.</a>
 
@@ -31,17 +32,31 @@ export function Navbar({ onSearchSelect }: Props) {
           <span className="inline-block w-16" aria-hidden="true"></span>
         </nav>
 
-        {/* Centered Search */}
-        <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-xl">
+  {/* Search (compact on mobile, centered on ≥sm) */}
+  <div className="relative mx-auto sm:mx-0 sm:absolute sm:left-1/2 sm:-translate-x-1/2 w-[72vw] max-w-xs sm:max-w-xl sm:w-full">
           <div className="relative">
             <input
               ref={inputRef}
               onFocus={()=>setOpen(true)}
-              placeholder="Search by Inspiration"
-              className="w-full h-11 rounded-xl bg-neutral-200 text-neutral-900 placeholder-neutral-700 px-10 pr-4 border border-transparent focus:outline-none focus:ring-0 focus:border-neutral-300"
+      type="search"
+      aria-label="Search confessions"
+      placeholder="Search by Inspiration"
+      className="w-full h-11 rounded-xl bg-neutral-200 text-neutral-900 placeholder-neutral-700 px-10 pr-4 border border-transparent focus:outline-none focus:ring-0 focus:border-neutral-300 text-sm sm:text-base"
             />
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
           </div>
+        </div>
+
+        {/* Mobile Submit button */}
+        <div className="ml-2 sm:hidden">
+          <button
+            onClick={() => navigate('/submit')}
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-neutral-300 text-[13px] text-neutral-800 hover:bg-neutral-100"
+            aria-label="Submit a confession"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Submit</span>
+          </button>
         </div>
 
         {/* Right actions */}
@@ -58,7 +73,13 @@ export function Navbar({ onSearchSelect }: Props) {
             </svg>
             <span>GitHub</span>
           </a>
-          <button className="px-3 py-2 rounded-lg border border-neutral-300 hover:bg-neutral-100">Sumbit Confession</button>
+          <button
+            onClick={() => { window.history.pushState({}, '', '/submit'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+            className="px-3 py-2 rounded-lg border border-neutral-300 hover:bg-neutral-100"
+            aria-label="Go to submit confession"
+          >
+            Submit Confession
+          </button>
         </div>
       </div>
       <SearchPanel
