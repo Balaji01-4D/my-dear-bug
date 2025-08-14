@@ -6,3 +6,4 @@
 dev*.go
 .vscode
 /frontend
+app.yaml
