@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navbar } from '@/components/Navbar'
-import { fetchConfession } from '@/api'
+import { fetchConfession, postUpvote } from '@/api'
 import type { Confession } from '@/types'
 import { navigate } from '@/navigation'
 import Prism from 'prismjs'
@@ -59,8 +59,8 @@ export function ConfessionPage({ id }: { id: number }) {
     if (voting || !data) return
     setVoting(true)
     try {
-      const res = await fetch(`/confessions/${data.id}/upvote`, { method: 'POST' })
-      if (res.ok) setUpvotes(v => v + 1)
+      await postUpvote(data.id)
+      setUpvotes(v => v + 1)
     } finally {
       setVoting(false)
     }

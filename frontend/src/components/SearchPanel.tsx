@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAsync } from '@/hooks/useAsync'
-import { fetchConfessions, fetchTopConfessions } from '@/api'
+import { fetchConfessions, fetchTopConfessions, fetchTags } from '@/api'
 import type { Confession } from '@/types'
 
 type Props = {
@@ -13,11 +13,7 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
   const [active, setActive] = useState<'trending' | 'language' | 'tags' | 'collections'>('trending')
   const latest = useAsync(() => fetchConfessions({ limit: 50, offset: 0 }), [])
   const top = useAsync(() => fetchTopConfessions(10), [])
-  const tags = useAsync(async () => {
-    const res = await fetch('/tags')
-    if (!res.ok) throw new Error('Failed to load tags')
-    return (await res.json()) as { id: number; name: string }[]
-  }, [])
+  const tags = useAsync(fetchTags, [])
 
   useEffect(() => {
     function onEsc(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }

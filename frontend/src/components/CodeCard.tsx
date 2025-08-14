@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import type { Confession } from '@/types'
 import clsx from 'clsx'
 import { navigate } from '@/navigation'
+import { postUpvote } from '@/api'
 
 export function CodeCard({ item, className, minHeight = 220, showDescription = true, showTags = true }: { item: Confession; className?: string; minHeight?: number; showDescription?: boolean; showTags?: boolean }) {
   useEffect(() => { Prism.highlightAllUnder(document.body) }, [item.snippet])
@@ -34,8 +35,8 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
     if (voting) return
     setVoting(true)
     try {
-      const res = await fetch(`/confessions/${item.id}/upvote`, { method: 'POST' })
-      if (res.ok) setUpvotes(v => v + 1)
+  await postUpvote(item.id)
+  setUpvotes(v => v + 1)
     } catch (e) {
       // no-op
     } finally {
