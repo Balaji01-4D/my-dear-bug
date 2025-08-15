@@ -15,24 +15,18 @@ func NewService(r *Repository) *Service {
 	return &Service{repo: r}
 }
 
-func (s *Service) Upvote(confessionID uint, ipHash string) error {
-
-	err := s.repo.Save(&Upvote{
-		ConfessionID: confessionID,
-		IPHash:       ipHash,
-		CreatedAt:    time.Now(),
-	})
-
-	if err != nil {
+func (s *Service) Upvote(confessionID uint, ipHash, clientHash string) error {
+	now := time.Now()
+	up := &Upvote{ConfessionID: confessionID, IPHash: ipHash, ClientHash: clientHash, CreatedAt: now}
+	if err := s.repo.Save(up); err != nil {
+		// If insert fails (likely due to unique constraint), do not bump counter
 		return err
 	}
-
-	if err = s.repo.DB.Model(&confession.Confession{}).
+	// Only bump the confession's upvote count after successful insert
+	if err := s.repo.DB.Model(&confession.Confession{}).
 		Where("id = ?", confessionID).
 		UpdateColumn("upvotes", gorm.Expr("upvotes + 1")).Error; err != nil {
 		return err
 	}
-
 	return nil
-
 }
