@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/confessions", "destination": "https://go-rest-api-469015.as.r.appspot.com/confessions" },
+    { "source": "/confessions/(.*)", "destination": "https://go-rest-api-469015.as.r.appspot.com/confessions/$1" },
+    { "source": "/tags", "destination": "https://go-rest-api-469015.as.r.appspot.com/tags" },
+    { "source": "/tags/(.*)", "destination": "https://go-rest-api-469015.as.r.appspot.com/tags/$1" }
+  ]
+}
