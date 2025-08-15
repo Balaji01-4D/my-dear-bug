@@ -17,9 +17,9 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-	AllowOrigins:     []string{"*"}, // or "*" for dev (not for prod)
+	AllowOrigins:     []string{"https://my-dear-bug.vercel.app"}, 
 	AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
-	AllowHeaders:     []string{"Origin", "Content-Type"},
+	AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 	ExposeHeaders:    []string{"Content-Length"},
 	AllowCredentials: true,
 	MaxAge:           12 * time.Hour,
