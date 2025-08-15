@@ -3,14 +3,15 @@ import 'prismjs/components/prism-go'
 import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-python'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Confession } from '@/types'
 import clsx from 'clsx'
 import { navigate } from '@/navigation'
 import { postUpvote } from '@/api'
 
-export function CodeCard({ item, className, minHeight = 220, showDescription = true, showTags = true }: { item: Confession; className?: string; minHeight?: number; showDescription?: boolean; showTags?: boolean }) {
-  useEffect(() => { Prism.highlightAllUnder(document.body) }, [item.snippet])
+export function CodeCard({ item, className, minHeight = 220, showDescription = true, showTags = true, onOpen }: { item: Confession; className?: string; minHeight?: number; showDescription?: boolean; showTags?: boolean; onOpen?: (id: number) => void }) {
+  const codeRef = useRef<HTMLElement | null>(null)
+  useEffect(() => { if (codeRef.current) { try { Prism.highlightElement(codeRef.current) } catch {} } }, [item.snippet])
 
   const lang = (item.language || 'go').toLowerCase()
   const languageClass = `language-${lang === 'js' ? 'javascript' : lang}`
@@ -44,14 +45,14 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
     }
   }
 
+  const openDetail = () => {
+    if (onOpen) return onOpen(item.id)
+    navigate(`/c/confessions/${item.id}`)
+  }
+
   return (
     <article
-      className={clsx('code-card group rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 transition-colors shadow-soft cursor-pointer focus:outline-none focus:ring-2 focus:ring-black/30', className)}
-      onClick={() => navigate(`/c/confessions/${item.id}`)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/c/confessions/${item.id}`) } }}
-      aria-label={`Open confession ${item.title}`}
+      className={clsx('code-card group rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 transition-colors shadow-soft', className)}
     >
   <div className="p-4 sm:p-5">
         <div className="relative">
@@ -62,12 +63,19 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
           </div>
           {/* Upvote count moved near title */}
           {/* Code area (fixed height + fade) */}
-          <div className="rounded-xl bg-neutral-200 p-2.5 sm:p-3 relative">
+          <div
+            className="rounded-xl bg-neutral-200 p-2.5 sm:p-3 relative cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-black/30"
+            role="button"
+            tabIndex={0}
+            onClick={(e) => { e.stopPropagation(); openDetail() }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); openDetail() } }}
+            aria-label={`Preview ${item.title}`}
+          >
             <pre
               className={clsx(languageClass)}
         style={{ minHeight, maxHeight: minHeight, overflow: 'hidden', background: 'transparent' }}
             >
-              <code className={languageClass}>{item.snippet}</code>
+              <code ref={el => { codeRef.current = el }} className={languageClass}>{item.snippet}</code>
             </pre>
             {/* Fade + ellipsis indicator */}
             <div
@@ -81,7 +89,15 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
         </div>
         {/* Title + upvote button + description */}
   <div className="mt-3 sm:mt-4 flex items-start justify-between gap-3">
-          <h3 className="text-black font-semibold leading-snug line-clamp-2 flex-1">{item.title}</h3>
+          <h3
+            className="text-black font-semibold leading-snug line-clamp-2 flex-1 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onClick={(e) => { e.stopPropagation(); navigate(`/c/confessions/${item.id}`) }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); navigate(`/c/confessions/${item.id}`) } }}
+          >
+            {item.title}
+          </h3>
           <button
             onClick={(e) => { e.stopPropagation(); handleUpvote() }}
             disabled={voting}
@@ -94,7 +110,15 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
           </button>
         </div>
         {showDescription && item.description && (
-          <p className="text-neutral-600 text-sm line-clamp-2 mt-1">{item.description}</p>
+          <p
+            className="text-neutral-600 text-sm line-clamp-2 mt-1 cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onClick={(e) => { e.stopPropagation(); navigate(`/c/confessions/${item.id}`) }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); navigate(`/c/confessions/${item.id}`) } }}
+          >
+            {item.description}
+          </p>
         )}
         {/* Tags */}
         {showTags && (

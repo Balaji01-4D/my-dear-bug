@@ -3,11 +3,22 @@ import { Section } from '@/components/Section'
 import { CodeCard } from '@/components/CodeCard'
 import { useAsync } from '@/hooks/useAsync'
 import { fetchConfessions, fetchTopConfessions } from '@/api'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Prism from 'prismjs'
+import { ConfessionPopup } from '@/components/ConfessionPopup'
+import { navigate } from '@/navigation'
 
 export function HomePage() {
   const [filters, setFilters] = useState<{ q?: string; language?: string; tag?: string; collection?: string }>({})
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const isDesktop = useMemo(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches, [])
+
+  // Close popup on route pop (Back)
+  useEffect(() => {
+    const onPop = () => { setSelectedId(null) }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
   const latest = useAsync(() => {
     if (filters.collection) {
       const col = filters.collection
@@ -90,8 +101,20 @@ export function HomePage() {
           {!latest.loading && !latest.error && latest.data && latest.data.length === 0 && (
             <p className="text-neutral-400">No confessions yet. Be the first to share!</p>
           )}
-          {latest.data?.map(item => (
-            <CodeCard key={item.id} item={item} />
+          {latest.data?.map((item: any) => (
+            <CodeCard
+              key={item.id}
+              item={item}
+              onOpen={(id) => {
+                if (isDesktop) {
+                  setSelectedId(id)
+                  // reflect in URL for shareability
+                  history.pushState({}, '', `/c/confessions/${id}`)
+                } else {
+                  navigate(`/c/confessions/${id}`)
+                }
+              }}
+            />
           ))}
         </div>
       </Section>
@@ -105,8 +128,19 @@ export function HomePage() {
           {!top.loading && top.data && top.data.length === 0 && (
             <p className="text-neutral-400">No upvoted confessions yet. Come back soon!</p>
           )}
-          {top.data?.map(item => (
-            <CodeCard key={item.id} item={item} />
+          {top.data?.map((item: any) => (
+            <CodeCard
+              key={item.id}
+              item={item}
+              onOpen={(id) => {
+                if (isDesktop) {
+                  setSelectedId(id)
+                  history.pushState({}, '', `/c/confessions/${id}`)
+                } else {
+                  navigate(`/c/confessions/${id}`)
+                }
+              }}
+            />
           ))}
         </div>
       </Section>
@@ -126,6 +160,17 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Desktop corner popup for confession detail */}
+      {selectedId !== null && (
+        <ConfessionPopup
+          id={selectedId}
+          onClose={() => {
+            setSelectedId(null)
+            history.pushState({}, '', '/')
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -141,9 +186,9 @@ function Nominees() {
   if (nominees.data) setTimeout(() => Prism.highlightAllUnder(document.body), 0)
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
       {(nominees.data ?? Array.from({ length: 2 }).map((_,i)=>({id:i,title:'Loading…',description:'',language:'go',snippet:'// Loading...',tags:[],upvotes:0}))).map((c:any)=> (
-        <CodeCard key={c.id} item={c} />
+  <CodeCard key={c.id} item={c} className="w-full nominee-gold" />
       ))}
     </div>
   )

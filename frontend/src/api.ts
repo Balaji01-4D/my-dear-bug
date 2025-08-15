@@ -70,6 +70,21 @@ export async function fetchRandom() {
   return (await res.json()) as Confession
 }
 
+export async function fetchSearch(params: { q?: string; language?: string; tag?: string; limit?: number; offset?: number }) {
+  const path = withParams('/confessions/search', {
+    q: params.q,
+    language: params.language,
+    tag: params.tag,
+    limit: params.limit ?? 12,
+    offset: params.offset ?? 0,
+  })
+  return getCached<Confession[]>(path, 30_000, async () => {
+    const res = await fetch(path)
+    if (!res.ok) throw new Error('Failed to search')
+    return res.json()
+  })
+}
+
 export async function createConfession(payload: ConfessionRequest) {
   const res = await fetch('/confessions', {
     method: 'POST',

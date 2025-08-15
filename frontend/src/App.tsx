@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { HomePage } from './pages/HomePage'
 import { SubmitPage } from '@/pages/SubmitPage'
 import { ConfessionPage } from '@/pages/ConfessionPage'
+import { SearchResultsPage } from '@/pages/SearchResultsPage'
 import { normalizeConfessionPath } from '@/navigation'
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
   }, [])
 
   if (path === '/submit') return <SubmitPage />
+  if (path.startsWith('/search')) return <SearchResultsPage />
 
   // Preferred SPA detail path
   const matchC = path.match(/^\/c\/confessions\/(\d+)$/)

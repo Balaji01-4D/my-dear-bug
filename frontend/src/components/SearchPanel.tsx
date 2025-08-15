@@ -60,7 +60,7 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
               {active === 'trending' && (
                 <TwoColList>
                   {(top.data ?? []).map(item => (
-                    <Row key={item.id} label={item.title} count={item.upvotes} onClick={()=>{onSelect({ q: item.title }); onClose()}} />
+                    <Row key={item.id} label={item.title} count={item.upvotes} onClick={()=>{ onSelect({ q: item.title }); const s = new URLSearchParams({ q: item.title }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
                   ))}
                 </TwoColList>
               )}
@@ -68,7 +68,7 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
               {active === 'language' && (
                 <TwoColList>
                   {languages.map(([name, count]) => (
-                    <Row key={name} label={name} count={count} onClick={()=>{onSelect({ language: name }); onClose()}} />
+                    <Row key={name} label={name} count={count} onClick={()=>{ onSelect({ language: name }); const s = new URLSearchParams({ language: name }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
                   ))}
                 </TwoColList>
               )}
@@ -76,18 +76,18 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
               {active === 'tags' && (
                 <TwoColList>
                   {(tags.data ?? []).map((t) => (
-                    <Row key={t.id} label={t.name} onClick={()=>{onSelect({ tag: t.name }); onClose()}} />
+                    <Row key={t.id} label={t.name} onClick={()=>{ onSelect({ tag: t.name }); const s = new URLSearchParams({ tag: t.name }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
                   ))}
                 </TwoColList>
               )}
 
               {active === 'collections' && (
                 <TwoColList>
-                  <Row label="Top" onClick={()=>{onSelect({ collection: 'top' }); onClose()}} />
-                  <Row label="Trending (Weekly)" onClick={()=>{onSelect({ collection: 'trending-weekly' }); onClose()}} />
-                  <Row label="Trending (Monthly)" onClick={()=>{onSelect({ collection: 'trending-monthly' }); onClose()}} />
-                  <Row label="Hall of Fame" onClick={()=>{onSelect({ collection: 'hall-of-fame' }); onClose()}} />
-                  <Row label="Random" onClick={()=>{onSelect({ collection: 'random' }); onClose()}} />
+                  <Row label="Top" onClick={()=>{ onSelect({ collection: 'top' }); const s = new URLSearchParams({ q: 'top' }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
+                  <Row label="Trending (Weekly)" onClick={()=>{ onSelect({ collection: 'trending-weekly' }); const s = new URLSearchParams({ q: 'trending weekly' }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
+                  <Row label="Trending (Monthly)" onClick={()=>{ onSelect({ collection: 'trending-monthly' }); const s = new URLSearchParams({ q: 'trending monthly' }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
+                  <Row label="Hall of Fame" onClick={()=>{ onSelect({ collection: 'hall-of-fame' }); const s = new URLSearchParams({ q: 'hall of fame' }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
+                  <Row label="Random" onClick={()=>{ onSelect({ collection: 'random' }); const s = new URLSearchParams({ q: 'random' }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); onClose() }} />
                 </TwoColList>
               )}
             </div>
