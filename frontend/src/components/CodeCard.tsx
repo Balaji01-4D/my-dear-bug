@@ -50,21 +50,26 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
     navigate(`/c/confessions/${item.id}`)
   }
 
+  const lineCount = (item.snippet || '').split('\n').length
+  const clamp = lineCount * 20 > 192 // rough line-height heuristic for fade overlay
+  const previewHeight = 192
   return (
     <article
-      className={clsx('code-card group rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 transition-colors shadow-soft', className)}
+      className={clsx('code-card group relative rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 transition-colors shadow-soft hover:shadow-lg hover:ring-1 hover:ring-black/5', className)}
     >
-  <div className="p-4 sm:p-5">
+      {/* Language accent bar */}
+      <div className="absolute inset-x-0 top-0 h-[3px] rounded-t-2xl" style={{ background: dotColor }} />
+      <div className="p-4 sm:p-5">
         <div className="relative">
           {/* Language badge */}
-          <div className="absolute left-3 top-3 z-10 inline-flex items-center gap-2 rounded-full bg-black/55 px-3 py-1 text-xs font-medium text-white backdrop-blur border border-white/10 shadow-sm">
+          <div className="absolute left-3 top-3 z-10 inline-flex items-center gap-2 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur border border-white/10 shadow-sm">
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: dotColor }} />
             <span className="uppercase tracking-wide">{item.language}</span>
           </div>
           {/* Upvote count moved near title */}
           {/* Code area (fixed height + fade) */}
           <div
-            className="rounded-xl bg-neutral-200 p-2.5 sm:p-3 relative cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-black/30"
+            className="rounded-xl bg-neutral-100 p-2.5 sm:p-3 relative cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-black/10 border border-neutral-200 scrollbar-none"
             role="button"
             tabIndex={0}
             onClick={(e) => { e.stopPropagation(); openDetail() }}
@@ -73,16 +78,14 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
           >
             <pre
               className={clsx(languageClass)}
-        style={{ minHeight, maxHeight: minHeight, overflow: 'hidden', background: 'transparent' }}
+              style={{ height: previewHeight, overflow: 'hidden', background: 'transparent' }}
             >
               <code ref={el => { codeRef.current = el }} className={languageClass}>{item.snippet}</code>
             </pre>
             {/* Fade + ellipsis indicator */}
             <div
               className="pointer-events-none absolute inset-x-3 bottom-3 h-8"
-              style={{
-                background: 'linear-gradient(to bottom, rgba(229,231,235,0), rgba(229,231,235,1))'
-              }}
+              style={{ background: 'linear-gradient(to bottom, rgba(245,245,245,0), rgba(245,245,245,1))' }}
             />
             <div className="pointer-events-none absolute right-4 bottom-2 text-neutral-500 text-sm">…</div>
           </div>
@@ -101,7 +104,7 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
           <button
             onClick={(e) => { e.stopPropagation(); handleUpvote() }}
             disabled={voting}
-            className="shrink-0 inline-flex items-center gap-1 rounded-md border border-neutral-300 px-2.5 py-1 text-xs text-neutral-800 hover:bg-neutral-100 disabled:opacity-60"
+            className="shrink-0 inline-flex items-center gap-1 rounded-md border border-neutral-300 px-2.5 py-1 text-xs text-neutral-800 hover:bg-neutral-100 disabled:opacity-60 shadow-sm"
             aria-label="Upvote confession"
             title="Upvote"
           >
@@ -124,7 +127,9 @@ export function CodeCard({ item, className, minHeight = 220, showDescription = t
         {showTags && (
           <div className="mt-2 sm:mt-3 flex flex-wrap gap-1.5 sm:gap-2 text-xs text-neutral-600">
             {item.tags?.slice(0, 3).map(t => (
-              <span key={t.id} className="px-2 py-0.5 rounded bg-neutral-100 border border-neutral-200">#{t.name}</span>
+              <span key={t.id} className="px-2 py-0.5 rounded bg-neutral-100 border border-neutral-200">
+                #{t.name}
+              </span>
             ))}
           </div>
         )}

@@ -37,8 +37,8 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
   return (
     <div className="fixed inset-x-0 top-16 z-50">
   <div className="mx-auto max-w-6xl px-3 sm:px-6 lg:px-8">
-        <div className="rounded-2xl bg-neutral-100 border border-neutral-200 shadow-2xl">
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 p-2 sm:p-4 max-h-[70vh] overflow-hidden">
+        <div className="rounded-2xl bg-white/95 backdrop-blur border border-neutral-200 shadow-2xl">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 p-2 sm:p-4 max-h-[70vh] sm:max-h-[70vh] overflow-hidden">
             {/* Left rail */}
             <div className="sm:col-span-3 sm:pr-2 sm:border-r sm:border-neutral-200">
               <RailButton active={active==='trending'} onClick={()=>setActive('trending')} icon={<span className="text-neutral-700">↻</span>}>
@@ -102,7 +102,7 @@ export function SearchPanel({ open, onClose, onSelect }: Props) {
 
 function RailButton({ active, onClick, icon, children }: { active?: boolean; onClick: () => void; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-left ${active ? 'bg-white border-neutral-300 shadow-sm' : 'border-transparent hover:bg-white'}`}>
+  <button onClick={onClick} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-left transition ${active ? 'bg-white border-neutral-300 shadow-sm' : 'border-transparent hover:bg-neutral-50'}`}>
       <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-neutral-200 text-xs">{icon}</span>
       <span className="text-[15px]">{children}</span>
     </button>
@@ -119,7 +119,7 @@ function TwoColList({ children }: { children: React.ReactNode }) {
 
 function Row({ label, count, onClick }: { label: string; count?: number; onClick?: () => void }) {
   return (
-    <button onClick={onClick} className="flex items-center justify-between px-2 py-2 rounded hover:bg-white text-[15px]">
+  <button onClick={onClick} className="flex items-center justify-between px-2 py-2 rounded hover:bg-neutral-50 text-[15px]">
       <span className="truncate text-neutral-800">{label}</span>
       {typeof count === 'number' && <span className="text-neutral-500">{count}</span>}
     </button>

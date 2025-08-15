@@ -59,10 +59,10 @@ export function ConfessionPopup({ id, onClose }: { id: number; onClose: () => vo
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       {/* Modal Shell (Instagram-like) */}
-      <div className="relative z-10 w-[min(1100px,96vw)] h-[82vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex">
+      <div className="relative z-10 w-[min(1100px,96vw)] h-[82vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex border border-neutral-800/5">
         {/* Left: media/code area */}
         <div className="flex-1 bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
-      <div className="w-full h-full overflow-auto p-6">
+      <div className="w-full h-full overflow-auto p-6 theme-monokai">
             {data?.snippet ? (
         <pre className={`${languageClass} m-0`} style={{ background: 'transparent', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace', fontVariantLigatures: 'none', lineHeight: 1.5, whiteSpace: 'pre' }}>
                 <code ref={el => { codeRef.current = el }} className={`${languageClass} text-neutral-100`}>{data.snippet}</code>
@@ -87,8 +87,8 @@ export function ConfessionPopup({ id, onClose }: { id: number; onClose: () => vo
               <h3 className="mt-1 text-base font-semibold truncate" title={data?.title}>{data?.title || (loading ? 'Loading…' : 'Not found')}</h3>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={handleUpvote} disabled={voting} className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 disabled:opacity-60">▲</button>
-              <button onClick={onClose} className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100">✕</button>
+              <button onClick={handleUpvote} disabled={voting} className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 disabled:opacity-60 shadow-sm">▲</button>
+              <button onClick={onClose} className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 shadow-sm">✕</button>
             </div>
           </div>
           {/* Body: description only */}

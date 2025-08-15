@@ -1,7 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-// Make optional plugins robust during local dev
+// Tailwind v3.3+ includes line-clamp by default; keep plugins empty for now
 const plugins = []
-try { plugins.push(require('@tailwindcss/line-clamp')) } catch {}
 
 export default {
   content: [

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { navigate } from '@/navigation'
 import { SearchPanel } from '@/components/SearchPanel'
 
@@ -8,13 +8,66 @@ type Props = {
 
 export function Navbar({ onSearchSelect }: Props) {
   const [open, setOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const [atTop, setAtTop] = useState(true)
+  const [isDesktop, setIsDesktop] = useState<boolean>(() => typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : true)
   const inputRef = useRef<HTMLInputElement>(null)
+  const lastYRef = useRef<number>(typeof window !== 'undefined' ? window.scrollY : 0)
+  const lastToggleYRef = useRef<number>(0)
+
+  // Hide on scroll down, show on scroll up
+  useEffect(() => {
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const y = Math.max(window.scrollY || 0, 0)
+        const lastY = lastYRef.current
+        const dy = y - lastY
+        setAtTop(y <= 4)
+
+        // Always show near the very top to avoid awkward hiding
+        if (y <= 60) {
+          if (hidden) { setHidden(false); lastToggleYRef.current = y }
+          lastYRef.current = y
+          ticking = false
+          return
+        }
+
+        // Hysteresis to avoid flapping: require distance since last toggle
+        const sinceToggle = Math.abs(y - lastToggleYRef.current)
+        const downTrigger = dy > 6 // scrolling down
+        const upTrigger = dy < -10 // scrolling up (a bit stronger to avoid noise)
+
+        if (downTrigger && !hidden && y > 100 && sinceToggle > 80) {
+          setHidden(true)
+          lastToggleYRef.current = y
+        } else if (upTrigger && hidden && sinceToggle > 24) {
+          setHidden(false)
+          lastToggleYRef.current = y
+        }
+        lastYRef.current = y
+        ticking = false
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [hidden])
+
+  // Ensure header visible while search overlay is open
+  useEffect(() => { if (open) setHidden(false) }, [open])
+
+  const isHidden = !open && hidden
   return (
     <>
-    <header className="site-header fixed inset-x-0 top-0 z-40 bg-white/90 backdrop-blur border-b border-neutral-200">
+    <header className={`site-header fixed inset-x-0 top-0 z-40 bg-white/80 backdrop-blur border-b border-neutral-200 transition-transform duration-300 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}>
       <div className="relative mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 h-16 flex items-center gap-3">
         {/* Logo */}
-        <a href="#" className="text-2xl font-extrabold tracking-tight text-black mr-1">W.</a>
+        <a href="#" className="flex items-center gap-2 mr-1 group" aria-label="Go to home">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white font-bold">MB</span>
+          <span className="hidden sm:inline whitespace-nowrap text-[17px] font-semibold tracking-tight text-neutral-900">My Dear Bug</span>
+        </a>
 
         {/* Primary nav */}
         <nav className="hidden lg:flex items-center gap-6 text-[15px] text-neutral-700">
@@ -41,8 +94,8 @@ export function Navbar({ onSearchSelect }: Props) {
               onFocus={()=>setOpen(true)}
       type="search"
       aria-label="Search confessions"
-      placeholder="Search by Inspiration"
-      className="w-full h-11 rounded-xl bg-neutral-200 text-neutral-900 placeholder-neutral-700 px-10 pr-4 border border-transparent focus:outline-none focus:ring-0 focus:border-neutral-300 text-sm sm:text-base"
+      placeholder="Search confessions, languages, tags"
+  className="w-full h-11 rounded-xl bg-white/95 text-neutral-900 placeholder-neutral-600 px-10 pr-4 border border-neutral-200 shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-4 focus:ring-black/10 focus:border-neutral-300 text-sm sm:text-base"
   onKeyDown={(e)=>{ if (e.key==='Enter') { const q=(e.currentTarget.value||'').trim(); if (q) { const s=new URLSearchParams({ q }); window.history.pushState({}, '', `/search?${s.toString()}`); window.dispatchEvent(new PopStateEvent('popstate')); setOpen(false) } } }}
             />
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
@@ -63,11 +116,18 @@ export function Navbar({ onSearchSelect }: Props) {
 
         {/* Right actions */}
         <div className="ml-auto hidden sm:flex items-center gap-3 text-[15px]">
+          <button
+            onClick={() => { window.history.pushState({}, '', '/submit'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+            className="px-3 py-2 rounded-lg border border-neutral-300 hover:bg-neutral-100 shadow-sm"
+            aria-label="Go to submit confession"
+          >
+            Submit Confession
+          </button>
           <a
             href="https://github.com/balaji01-4d/my-dear-bug"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-black text-white hover:bg-black/90"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-black text-white hover:bg-black/90 shadow-sm"
             aria-label="Open GitHub repository"
           >
             <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="currentColor">
@@ -75,13 +135,6 @@ export function Navbar({ onSearchSelect }: Props) {
             </svg>
             <span>GitHub</span>
           </a>
-          <button
-            onClick={() => { window.history.pushState({}, '', '/submit'); window.dispatchEvent(new PopStateEvent('popstate')) }}
-            className="px-3 py-2 rounded-lg border border-neutral-300 hover:bg-neutral-100"
-            aria-label="Go to submit confession"
-          >
-            Submit Confession
-          </button>
         </div>
       </div>
       <SearchPanel
@@ -91,7 +144,8 @@ export function Navbar({ onSearchSelect }: Props) {
       />
     </header>
   {/* Spacer so page content doesn't hide under fixed header */}
-  <div className="h-16" aria-hidden="true" />
+    {/* Keep spacer fixed on mobile to prevent bounce; animate height only on ≥lg */}
+    <div className={`h-16 ${(!open && hidden) ? 'lg:h-0' : 'lg:h-16'} lg:transition-[height] lg:duration-300`} aria-hidden="true" />
   </>
   )
 }
