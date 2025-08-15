@@ -1,6 +1,18 @@
 import type { Confession, ConfessionRequest, Tag } from './types'
 
+// Base URL for API when deployed (e.g., Vercel). In dev, keep empty to use Vite proxy.
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? '').trim().replace(/\/+$/, '')
+
+function apiFetch(input: string, init?: RequestInit) {
+  const isAbsolute = /^https?:\/\//i.test(input)
+  const url = isAbsolute
+    ? input
+    : (API_BASE ? `${API_BASE}${input.startsWith('/') ? '' : '/'}${input}` : input)
+  return fetch(url, init)
+}
+
 const withParams = (base: string, params?: Record<string, string | number | undefined>) => {
+  // Build a URL against current origin for dev; apiFetch will prefix API_BASE in prod.
   const url = new URL(base, window.location.origin)
   if (params) Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== '') url.searchParams.set(k, String(v))
@@ -49,7 +61,7 @@ export async function fetchConfessions(params?: { limit?: number; offset?: numbe
     ? withParams(`/confessions/language/${encodeURIComponent(params.language)}`, { limit: params.limit ?? 12, offset: params.offset ?? 0 })
     : withParams('/confessions', { limit: params?.limit ?? 12, offset: params?.offset ?? 0 })
   return getCached<Confession[]>(path, 30_000, async () => {
-    const res = await fetch(path)
+  const res = await apiFetch(path)
     if (!res.ok) throw new Error('Failed to fetch confessions')
     return res.json()
   })
@@ -58,14 +70,14 @@ export async function fetchConfessions(params?: { limit?: number; offset?: numbe
 export async function fetchTopConfessions(limit = 6) {
   const path = withParams('/confessions/top', { limit })
   return getCached<Confession[]>(path, 60_000, async () => {
-    const res = await fetch(path)
+  const res = await apiFetch(path)
     if (!res.ok) throw new Error('Failed to fetch top confessions')
     return res.json()
   })
 }
 
 export async function fetchRandom() {
-  const res = await fetch('/confessions/random')
+  const res = await apiFetch('/confessions/random')
   if (!res.ok) throw new Error('Failed to fetch random confession')
   return (await res.json()) as Confession
 }
@@ -79,14 +91,14 @@ export async function fetchSearch(params: { q?: string; language?: string; tag?:
     offset: params.offset ?? 0,
   })
   return getCached<Confession[]>(path, 30_000, async () => {
-    const res = await fetch(path)
+  const res = await apiFetch(path)
     if (!res.ok) throw new Error('Failed to search')
     return res.json()
   })
 }
 
 export async function createConfession(payload: ConfessionRequest) {
-  const res = await fetch('/confessions', {
+  const res = await apiFetch('/confessions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -105,7 +117,7 @@ export async function createConfession(payload: ConfessionRequest) {
 export async function fetchConfession(id: number) {
   const path = `/confessions/${id}`
   return getCached<Confession>(path, 60_000, async () => {
-    const res = await fetch(path)
+  const res = await apiFetch(path)
     if (res.status === 404) throw new Error('Confession not found')
     if (!res.ok) throw new Error('Failed to fetch confession')
     return res.json()
@@ -115,14 +127,14 @@ export async function fetchConfession(id: number) {
 export async function fetchTags() : Promise<Tag[]> {
   const path = '/tags'
   return getCached<Tag[]>(path, 300_000, async () => {
-    const res = await fetch(path)
+  const res = await apiFetch(path)
     if (!res.ok) throw new Error('Failed to load tags')
     return res.json()
   })
 }
 
 export async function postUpvote(id: number) {
-  const res = await fetch(`/confessions/${id}/upvote`, { method: 'POST' })
+  const res = await apiFetch(`/confessions/${id}/upvote`, { method: 'POST' })
   if (!res.ok) throw new Error('Failed to upvote')
   // Invalidate affected entries: detail and lists/top
   invalidateCache(`/confessions/${id}`)
