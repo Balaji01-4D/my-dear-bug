@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	middleware "github.com/Balaji01-4D/my-dear-bug/internals/middleware"
+	middleware "github.com/Balaji01-4D/shit-happens/internals/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

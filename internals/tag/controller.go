@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Balaji01-4D/my-dear-bug/internals/middleware"
+	"github.com/Balaji01-4D/shit-happens/internals/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -16,7 +16,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 	tagRoutes := r.Group("/tags")
 
-
 	tagRoutes.GET("", func(c *gin.Context) {
 		tags, err := service.GetTags()
 
@@ -26,9 +25,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		}
 
 		c.JSON(http.StatusOK, tags)
-	})	
-
-
+	})
 
 	tagRoutes.POST("", func(c *gin.Context) {
 
@@ -50,11 +47,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			return
 		}
 
-			c.Status(http.StatusOK)
+		c.Status(http.StatusOK)
 	})
 
-
-	tagRoutes.GET("/suggest", func (c *gin.Context)  {
+	tagRoutes.GET("/suggest", func(c *gin.Context) {
 
 		query := strings.ToLower(c.Query("query"))
 
@@ -66,13 +62,13 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		tagResult, err := service.SuggestTags(query)
 
 		if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB query failed"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "DB query failed"})
 
 			return
 		}
 
 		c.JSON(http.StatusOK, tagResult)
-		
+
 	})
 
 	tagRoutes.DELETE("/:id", middleware.AdminAuthMiddleware(), func(c *gin.Context) {
@@ -86,5 +82,5 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, gin.H{"message": "tag deleted successfully"})
 
 	})
-	
+
 }

@@ -3,7 +3,7 @@ package upvote
 import (
 	"time"
 
-	confession "github.com/Balaji01-4D/my-dear-bug/internals/confession"
+	confession "github.com/Balaji01-4D/shit-happens/internals/confession"
 	"gorm.io/gorm"
 )
 

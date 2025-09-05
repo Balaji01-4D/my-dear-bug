@@ -2,12 +2,13 @@ package main
 
 import (
 	"time"
-	"github.com/Balaji01-4D/my-dear-bug/config"
-	bug "github.com/Balaji01-4D/my-dear-bug/internals/confession"
-	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
-	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
-	"github.com/gin-gonic/gin"
+
+	"github.com/Balaji01-4D/shit-happens/config"
+	bug "github.com/Balaji01-4D/shit-happens/internals/confession"
+	"github.com/Balaji01-4D/shit-happens/internals/tag"
+	"github.com/Balaji01-4D/shit-happens/internals/upvote"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -17,12 +18,12 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-	AllowOrigins:     []string{"https://my-dear-bug.vercel.app"}, 
-	AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
-	AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-	ExposeHeaders:    []string{"Content-Length"},
-	AllowCredentials: true,
-	MaxAge:           12 * time.Hour,
+		AllowOrigins:     []string{"https://shit-happens.vercel.app"},
+		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
 	bug.RegisterRoutes(r, db)
 	upvote.RegisterRoutes(r, db)

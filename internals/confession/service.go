@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
+	"github.com/Balaji01-4D/shit-happens/internals/tag"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

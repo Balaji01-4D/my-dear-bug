@@ -22,7 +22,7 @@ Controllers → Services → Repositories → Database (PostgreSQL)
 
 ### Project Structure
 ```
-my-dear-bug/
+shit-happens/
 ├── config/                  # Configuration & DB setup
 │   ├── config.go            # Loads env (DATABASE_URL, PORT) & InitDB
 │   └── devConfig.go         # .env loader (godotenv) for local dev
@@ -220,7 +220,7 @@ make install-deps
 
 2) Configure environment (.env)
 ```env
-DATABASE_URL=postgres://username:password@localhost:5432/mydearbug?sslmode=disable
+DATABASE_URL=postgres://username:password@localhost:5432/shithappens?sslmode=disable
 PORT=:8080
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=supersecret

@@ -1,4 +1,4 @@
-module github.com/Balaji01-4D/my-dear-bug
+module github.com/Balaji01-4D/shit-happens
 
 go 1.24.2
 

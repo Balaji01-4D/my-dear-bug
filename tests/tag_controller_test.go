@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -12,9 +11,9 @@ import (
 	"sync/atomic"
 	"testing"
 
-	confpkg "github.com/Balaji01-4D/my-dear-bug/internals/confession"
-	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
-	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
+	confpkg "github.com/Balaji01-4D/shit-happens/internals/confession"
+	"github.com/Balaji01-4D/shit-happens/internals/tag"
+	"github.com/Balaji01-4D/shit-happens/internals/upvote"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -79,7 +78,6 @@ func doJSONRequestTag(r *gin.Engine, method, path string, body any) *httptest.Re
 	r.ServeHTTP(w, req)
 	return w
 }
-
 
 /* ---------- Tag Route Tests ---------- */
 
@@ -216,7 +214,7 @@ func TestTags_Delete_Authorized(t *testing.T) {
 	}
 }
 
-/* ---------- Helpers ---------- 
+/* ---------- Helpers ----------
 
 func jsonNumber(id uint) string {
 	b, _ := json.Marshal(id)

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/Balaji01-4D/my-dear-bug/config"
-	confession "github.com/Balaji01-4D/my-dear-bug/internals/confession"
-	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
-	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
+	"github.com/Balaji01-4D/shit-happens/config"
+	confession "github.com/Balaji01-4D/shit-happens/internals/confession"
+	"github.com/Balaji01-4D/shit-happens/internals/tag"
+	"github.com/Balaji01-4D/shit-happens/internals/upvote"
 )
 
 func init() {

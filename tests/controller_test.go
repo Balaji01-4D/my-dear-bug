@@ -11,9 +11,9 @@ import (
 	"sync/atomic"
 	"testing"
 
-	confpkg "github.com/Balaji01-4D/my-dear-bug/internals/confession"
-	"github.com/Balaji01-4D/my-dear-bug/internals/tag"
-	"github.com/Balaji01-4D/my-dear-bug/internals/upvote"
+	confpkg "github.com/Balaji01-4D/shit-happens/internals/confession"
+	"github.com/Balaji01-4D/shit-happens/internals/tag"
+	"github.com/Balaji01-4D/shit-happens/internals/upvote"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -52,7 +52,7 @@ func setupRouter(t *testing.T) (*gin.Engine, *gorm.DB) {
 			db.Exec("TRUNCATE TABLE upvotes RESTART IDENTITY CASCADE")
 		})
 	} else {
-			// Fallback to in-memory sqlite
+		// Fallback to in-memory sqlite
 		db, err = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 		if err != nil {
 			t.Fatalf("failed to open sqlite test db: %v", err)
@@ -220,7 +220,9 @@ func TestDeleteConfession_Authorized(t *testing.T) {
 	if w.Code != http.StatusCreated {
 		t.Fatalf("create failed: status %d body=%s", w.Code, w.Body.String())
 	}
-	var created struct{ ID uint `json:"id"` }
+	var created struct {
+		ID uint `json:"id"`
+	}
 	_ = json.Unmarshal(w.Body.Bytes(), &created)
 	req := httptest.NewRequest(http.MethodDelete, "/confessions/"+jsonNumber(created.ID), nil)
 	req.RemoteAddr = nextRemoteAddr()

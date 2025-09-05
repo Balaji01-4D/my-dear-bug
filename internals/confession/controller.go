@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Balaji01-4D/my-dear-bug/internals/middleware"
+	"github.com/Balaji01-4D/shit-happens/internals/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -166,7 +166,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	confessionRoutes.GET("/search", func(c *gin.Context) {
 		q := strings.TrimSpace(c.Query("q"))
 
-
 		language := strings.TrimSpace(c.Query("language"))
 		tag := strings.TrimSpace(c.Query("tag"))
 
@@ -174,7 +173,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "query parameters required"})
 			return
 		}
-		
+
 		offset, limit := parsePagination(c)
 		results, err := service.Search(q, language, tag, offset, limit)
 		if err != nil {
