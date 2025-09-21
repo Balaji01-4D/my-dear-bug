@@ -1,10 +1,3 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "build",
-  "framework": "sveltekit",
-  "functions": {
-    "src/routes/**/*.ts": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  "framework": "sveltekit"
 }
