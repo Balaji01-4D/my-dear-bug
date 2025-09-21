@@ -124,15 +124,6 @@ export const tagApi = {
     return response.json();
   },
 
-  // POST /tags - Create a tag
-  async create(tag: { name: string }): Promise<Tag> {
-    const response = await apiFetch('/tags', {
-      method: 'POST',
-      body: JSON.stringify(tag),
-    });
-    return response.json();
-  },
-
   // GET /tags/suggest?query=<prefix> - Autocomplete suggestions
   async suggest(query: string): Promise<Tag[]> {
     const endpoint = buildUrl('/tags/suggest', { query });

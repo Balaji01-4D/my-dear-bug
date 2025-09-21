@@ -5,21 +5,19 @@
     import "../app.css";
 
     import application from "$lib/images/tabs/application.webp";
-    import clipboard from "$lib/images/tabs/clipboard.webp";
-    import window from "$lib/images/tabs/window.webp";
+    import clipboard from "$lib/images/tabs/upload.webp";
+    import window from "$lib/images/tabs/categories.webp";
 
-    import colors from "$lib/images/tabs/colors.webp";
-    import fonts from "$lib/images/tabs/fonts.webp";
+    import colors from "$lib/images/tabs/high-quality.webp";
+    import fonts from "$lib/images/tabs/recent.webp";
 
-    import keybinds from "$lib/images/tabs/keybinds.webp";
+    import keybinds from "$lib/images/tabs/trending.webp";
     import mouse from "$lib/images/tabs/mouse.webp";
 
-    import gtk from "$lib/images/tabs/gtk.svg";
-    import linux from "$lib/images/tabs/linux.webp";
-    import macos from "$lib/images/tabs/macos.webp";
+
 
     import github from "$lib/images/tabs/github.svg";
-    import ghostty from "$lib/images/tabs/ghostty.webp";
+    import ghostty from "$lib/images/tabs/podcast.webp";
 
     import config from "$lib/stores/config.svelte";
     import app from "$lib/stores/state.svelte";
@@ -323,35 +321,17 @@
                 Categories
             </Tab>
             <Gap />
-            <Tab route="/top-confessions">
+            <Tab route="/confessions?filter=top">
                 {#snippet icon()}<img src={colors} alt="Top Confessions" />{/snippet}
                 Top Confessions
             </Tab>
-            <Tab route="/recent">
+            <Tab route="/confessions/trending/weekly">
+                {#snippet icon()}<img src={keybinds} alt="Trending This Week" />{/snippet}
+                Trending This Week
+            </Tab>
+            <Tab route="/confessions">
                 {#snippet icon()}<img src={fonts} alt="Recent Posts" />{/snippet}
                 Recent Posts
-            </Tab>
-            <Gap />
-            <Tab route="/javascript">
-                {#snippet icon()}<img src={keybinds} alt="JavaScript" />{/snippet}
-                JavaScript
-            </Tab>
-            <Tab route="/python">
-                {#snippet icon()}<img src={mouse} alt="Python" />{/snippet}
-                Python
-            </Tab>
-            <Gap />
-            <Tab route="/css">
-                {#snippet icon()}<div class="icon-wrapper"><img src={gtk} alt="CSS" /></div>{/snippet}
-                CSS
-            </Tab>
-            <Tab route="/debugging">
-                {#snippet icon()}<img src={linux} alt="Debugging" />{/snippet}
-                Debugging
-            </Tab>
-            <Tab route="/production">
-                {#snippet icon()}<img src={macos} alt="Production" />{/snippet}
-                Production Fails
             </Tab>
             <Gap expand={true} />
             <Tab route="https://github.com/Balaji01-4D/my-dear-bug">
