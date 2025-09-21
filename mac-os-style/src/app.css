@@ -1,0 +1,134 @@
+@import "@fontsource-variable/inter";
+
+/* TODO: rework all of these vars */
+:root {
+    --app-width: 715px;
+    --app-height: 700px;
+    --sidebar-width: 215px;
+
+    /* Base text variables */
+    --font-family: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --font-family-mono: monospace, monospace;
+    --font-size: 14px;
+    --font-color: #EBE6EE;
+    --font-color-muted: #A19FA3;
+
+
+    /* Background levels */
+    --bg-level-1: #2C2733;
+    --bg-level-2: #2F2935;
+    --bg-level-3: #332D38;
+    --bg-level-4: #39343F;
+    --bg-separator: #39333F;
+    --bg-input-focus: #1F1E1F;
+    --bg-modal: #231E2A;
+    --bg-basic-button: #635F68;
+
+    /* Corresponding border levels */
+    --border-level-1: #000000;
+    --border-level-2: #4F4A54;
+    --border-level-3: #4C4651;
+    --border-level-4: #423E48;
+    --border-separator: #302B37;
+    --border-input: #443e4b;
+    --border-input-focus: 3px solid var(--color-input-accent);
+
+    /* Border radii */
+    --radius-level-1: 15px;
+    --radius-level-2: 12px;
+    --radius-level-3: 8px;
+    --radius-level-4: 6px;
+    --radius-level-5: 4px;
+
+    /* Switch colors */
+    --switch-body-color: var(--border-input);
+    --switch-active-body-color: hsl(from var(--switch-body-color) h s calc(l + 10));
+    --switch-checked-color: var(--color-input-accent);
+    --switch-active-checked-color: hsl(from var(--switch-checked-color) h s calc(l + 10));
+
+    /* Special colors */
+    --font-color-accent: #56A4F5;
+    --color-selected: #134FAC;
+    --color-input-accent: #1769E6;
+    
+    --color-danger: #F25F58;
+    --color-warning: #FBBE3C;
+    --color-success: #58CB42;
+
+    /* Shit Happens theme colors */
+    --bg-card: var(--bg-level-3);
+    --border-card: var(--border-level-3);
+    --bg-input: var(--bg-level-4);
+    --confession-accent: #FF6B6B;
+    --confession-accent-soft: #FFB3B3;
+    /*
+    tab color #134FAC
+    switch color #1675DB
+    slider #1769E6
+    */
+
+
+    font-size: var(--font-size);
+    font-family: var(--font-family);
+    color: var(--font-color);
+}
+
+* {box-sizing: border-box;}
+
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar:hover {
+    background-color: #171717;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    display: initial;
+    border-radius: 10px;
+    background-color: #959595;
+    border: 2px solid var(--bg-level-1);
+    /* padding: 12px; */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    border-width: 0;
+}
+
+
+body {
+    min-height: 100vh;
+    margin: 0;
+	background-image: url("$lib/images/monterey.webp");
+	background-attachment: fixed;
+	background-size: cover;
+	background-position: center center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+a {
+    color: var(--font-color-accent);
+    text-decoration: dotted underline;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+input,
+button,
+select {
+    font-size: inherit;
+    font-family: inherit;
+}
+
+button:focus:not(:focus-visible) {
+    outline: none;
+}
