@@ -2,50 +2,111 @@
     import Page from "$lib/views/Page.svelte";
     import Group from "$lib/components/settings/Group.svelte";
     import Gap from "$lib/components/Gap.svelte";
+    import api from "$lib/api";
+    import type { Tag, LoadingState } from "$lib/types";
+    import { onMount } from "svelte";
     
-    const categories = [
-        { name: "JavaScript Nightmares", count: 234, color: "#f7df1e" },
-        { name: "CSS Horror Stories", count: 189, color: "#1572b6" },
-        { name: "Python Mishaps", count: 156, color: "#3776ab" },
-        { name: "Database Disasters", count: 145, color: "#336791" },
-        { name: "Production Failures", count: 123, color: "#ff6b6b" },
-        { name: "Debugging Adventures", count: 98, color: "#4ecdc4" },
-        { name: "Git Conflicts", count: 87, color: "#f05032" },
-        { name: "API Nightmares", count: 76, color: "#61dafb" },
-        { name: "Memory Leaks", count: 65, color: "#ff9800" },
-        { name: "Semicolon Sins", count: 54, color: "#9c27b0" }
-    ];
+    let tags: Tag[] = $state([]);
+    let loadingState: LoadingState = $state('idle');
+    let errorMessage = $state('');
+    
+    // Common programming languages with their colors
+    const languageColors: Record<string, string> = {
+        'javascript': '#f7df1e',
+        'typescript': '#3178c6',
+        'python': '#3776ab',
+        'java': '#ed8b00',
+        'css': '#1572b6',
+        'html': '#e34f26',
+        'go': '#00add8',
+        'rust': '#ce422b',
+        'php': '#777bb4',
+        'ruby': '#cc342d',
+        'cpp': '#00599c',
+        'csharp': '#239120',
+        'sql': '#336791',
+        'devops': '#ff6b6b'
+    };
+    
+    function getLanguageColor(name: string): string {
+        const key = name.toLowerCase().replace(/[+#]/g, '');
+        return languageColors[key] || '#6b7280';
+    }
+    
+    async function loadTags() {
+        loadingState = 'loading';
+        errorMessage = '';
+        
+        try {
+            tags = await api.tags.getAll();
+            loadingState = 'success';
+        } catch (error) {
+            loadingState = 'error';
+            errorMessage = api.handleError(error as Error);
+        }
+    }
+    
+    onMount(() => {
+        loadTags();
+    });
 </script>
 
 <Page title="Categories">
     <section class="categories-container">
         <div class="hero-section">
-            <h2>Browse by Category</h2>
-            <p>Explore confessions organized by programming language, type of mistake, or technology</p>
+            <h2>Browse by Tags</h2>
+            <p>Explore confessions organized by technology, problem type, or category</p>
         </div>
         
         <Gap size={20} />
         
-        <div class="categories-grid">
-            {#each categories as category}
-                <a href="/category/{category.name.toLowerCase().replace(/ /g, '-')}" class="category-card">
-                    <div class="category-icon" style="background-color: {category.color}">
-                        {category.name.charAt(0)}
-                    </div>
-                    <div class="category-info">
-                        <h3 class="category-name">{category.name}</h3>
-                        <p class="category-count">{category.count} confessions</p>
-                    </div>
-                </a>
-            {/each}
-        </div>
+        <!-- Loading State -->
+        {#if loadingState === 'loading'}
+            <div class="loading">
+                <p>Loading tags...</p>
+            </div>
+        {/if}
+        
+        <!-- Error State -->
+        {#if loadingState === 'error'}
+            <div class="error-message">
+                <p>❌ {errorMessage}</p>
+                <button onclick={loadTags} class="retry-button">
+                    Try Again
+                </button>
+            </div>
+        {/if}
+        
+        <!-- Tags Grid -->
+        {#if loadingState === 'success' && tags.length > 0}
+            <div class="tags-grid">
+                {#each tags as tag}
+                    <a href="/confessions?tag={tag.name}" class="tag-card">
+                        <div class="tag-icon" style="background-color: {getLanguageColor(tag.name)}">
+                            {tag.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="tag-info">
+                            <h3 class="tag-name">#{tag.name}</h3>
+                            <p class="tag-description">Click to see confessions</p>
+                        </div>
+                    </a>
+                {/each}
+            </div>
+        {/if}
+        
+        <!-- Empty State -->
+        {#if loadingState === 'success' && tags.length === 0}
+            <div class="empty-state">
+                <p>No tags found. Be the first to create confessions with tags!</p>
+            </div>
+        {/if}
         
         <Gap size={30} />
         
-        <Group title="Popular Tags">
-            <div class="tags-container">
-                {#each ["debugging", "production", "javascript", "css", "python", "database", "git", "api", "performance", "security", "testing", "deployment"] as tag}
-                    <a href="/tag/{tag}" class="tag-link">#{tag}</a>
+        <Group title="Popular Programming Languages">
+            <div class="languages-container">
+                {#each ["javascript", "python", "css", "html", "java", "typescript", "go", "rust", "php", "ruby", "sql", "devops"] as language}
+                    <a href="/confessions?language={language}" class="language-link">{language}</a>
                 {/each}
             </div>
         </Group>
@@ -76,14 +137,39 @@
         font-size: 1.1rem;
     }
     
-    .categories-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 15px;
-        margin-bottom: 20px;
+    .loading, .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--font-color-accent);
     }
     
-    .category-card {
+    .error-message {
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.2);
+        border-radius: 8px;
+        color: var(--font-color);
+    }
+    
+    .retry-button {
+        margin-top: 10px;
+        padding: 8px 16px;
+        background: var(--bg-input);
+        border: 1px solid var(--border-input);
+        color: var(--font-color);
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .tags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .tag-card {
         display: flex;
         align-items: center;
         gap: 15px;
@@ -92,71 +178,67 @@
         border: 1px solid var(--border-card);
         border-radius: 12px;
         text-decoration: none;
-        color: var(--font-color);
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
-    .category-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        text-decoration: none;
-        color: var(--font-color);
+    .tag-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: var(--border-card-hover, var(--border-card));
     }
     
-    .category-icon {
+    .tag-icon {
         width: 50px;
         height: 50px;
-        border-radius: 12px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: bold;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         flex-shrink: 0;
     }
     
-    .category-info {
+    .tag-info {
         flex: 1;
     }
     
-    .category-name {
+    .tag-name {
+        margin: 0 0 5px 0;
         font-size: 1.2rem;
         font-weight: 600;
-        margin: 0 0 5px 0;
         color: var(--font-color);
     }
     
-    .category-count {
-        color: var(--font-color-accent);
+    .tag-description {
         margin: 0;
+        color: var(--font-color-accent);
         font-size: 0.9rem;
     }
     
-    .tags-container {
+    .languages-container {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        padding: 10px 0;
     }
     
-    .tag-link {
+    .language-link {
         background: var(--bg-input);
         border: 1px solid var(--border-input);
-        color: var(--font-color-accent);
-        padding: 8px 14px;
+        color: var(--font-color);
+        padding: 8px 16px;
         border-radius: 20px;
         text-decoration: none;
         font-size: 0.9rem;
         transition: all 0.2s ease;
+        text-transform: capitalize;
     }
     
-    .tag-link:hover {
+    .language-link:hover {
         background: var(--bg-input-focus);
         border-color: var(--border-input-focus);
         color: var(--font-color);
-        transform: translateY(-1px);
-        text-decoration: none;
     }
 </style>

@@ -4,12 +4,17 @@
     import Text from "$lib/components/settings/Text.svelte";
     import Dropdown from "$lib/components/settings/Dropdown.svelte";
     import Gap from "$lib/components/Gap.svelte";
+    import api from "$lib/api";
+    import type { ConfessionRequest, LoadingState } from "$lib/types";
+    import { goto } from "$app/navigation";
 
     let title = $state("");
     let description = $state("");
     let codeSnippet = $state("");
     let language = $state("JavaScript");
     let tags = $state("");
+    let submitState: LoadingState = $state('idle');
+    let errorMessage = $state('');
     
     const languages = [
         "JavaScript",
@@ -29,29 +34,55 @@
         "Other"
     ];
 
-    function handleSubmit() {
+    async function handleSubmit() {
         if (!title.trim() || !description.trim()) {
             alert("Please fill in at least the title and description!");
             return;
         }
         
-        // Here you would normally send to your API
-        console.log("Submitting confession:", {
-            title: title.trim(),
-            description: description.trim(),
-            snippet: codeSnippet.trim(),
-            language,
-            tags: tags.split(',').map(t => t.trim()).filter(t => t)
-        });
+        submitState = 'loading';
+        errorMessage = '';
         
-        alert("Thank you for sharing your confession! 🐛");
-        
-        // Reset form
+        try {
+            const confessionData: ConfessionRequest = {
+                title: title.trim(),
+                description: description.trim(),
+                snippet: codeSnippet.trim() || undefined,
+                language,
+                tags: tags.split(',').map(t => t.trim()).filter(t => t)
+            };
+            
+            const createdConfession = await api.confessions.create(confessionData);
+            
+            submitState = 'success';
+            
+            // Reset form
+            title = "";
+            description = "";
+            codeSnippet = "";
+            language = "JavaScript";
+            tags = "";
+            
+            // Show success message and redirect
+            alert("Thank you for sharing your confession! 🐛");
+            
+            // Navigate to confessions page or to the specific confession
+            goto('/confessions');
+            
+        } catch (error) {
+            submitState = 'error';
+            errorMessage = api.handleError(error as Error);
+        }
+    }
+    
+    function resetForm() {
         title = "";
         description = "";
         codeSnippet = "";
         language = "JavaScript";
         tags = "";
+        submitState = 'idle';
+        errorMessage = '';
     }
 </script>
 
@@ -111,14 +142,38 @@
             
             <Gap size={20} />
             
+            <!-- Error Message -->
+            {#if submitState === 'error' && errorMessage}
+                <div class="error-message">
+                    <p>❌ {errorMessage}</p>
+                </div>
+                <Gap size={15} />
+            {/if}
+            
             <div class="submit-section">
                 <button 
                     type="button"
                     onclick={handleSubmit}
                     class="submit-button"
+                    disabled={submitState === 'loading'}
                 >
-                    Submit Confession
+                    {#if submitState === 'loading'}
+                        Submitting...
+                    {:else}
+                        Submit Confession
+                    {/if}
                 </button>
+                
+                {#if submitState === 'error'}
+                    <button 
+                        type="button"
+                        onclick={resetForm}
+                        class="reset-button"
+                    >
+                        Reset Form
+                    </button>
+                {/if}
+                
                 <p class="disclaimer">
                     By submitting, you agree to share your story with the community to help other developers learn and grow.
                 </p>
@@ -202,6 +257,15 @@
         text-align: center;
     }
     
+    .error-message {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.2);
+        border-radius: 8px;
+        color: var(--font-color);
+    }
+    
     .submit-button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -213,15 +277,39 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        margin-right: 10px;
     }
     
-    .submit-button:hover {
+    .submit-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+    
+    .submit-button:hover:not(:disabled) {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
     }
     
-    .submit-button:active {
+    .submit-button:active:not(:disabled) {
         transform: translateY(0);
+    }
+    
+    .reset-button {
+        background: var(--bg-input);
+        border: 1px solid var(--border-input);
+        color: var(--font-color);
+        padding: 14px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-left: 10px;
+    }
+    
+    .reset-button:hover {
+        background: var(--bg-input-focus);
+        border-color: var(--border-input-focus);
     }
     
     .disclaimer {

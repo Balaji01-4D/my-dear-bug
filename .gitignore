@@ -5,5 +5,3 @@
 /.github
 dev*.go
 .vscode
-/frontend
-app.yaml
