@@ -4,6 +4,7 @@
     import Gap from "$lib/components/Gap.svelte";
     import api from "$lib/api";
     import { goto } from "$app/navigation";
+    import { browser } from "$app/environment";
     import type { PageData } from './$types';
     import type { Confession } from '$lib/types';
 
@@ -21,8 +22,17 @@
     }
 
     function handleClose() {
-        // Navigate back to confessions page
-        goto('/confessions');
+        // Use browser's back button to go to previous page
+        if (browser && window.history.length > 1) {
+            window.history.back();
+        } else {
+            // Fallback to confessions page if no history
+            goto('/confessions');
+        }
+    }
+
+    function handleBackButton() {
+        handleClose();
     }
 </script>
 
@@ -38,12 +48,12 @@
 <div class="confession-page">
     <div class="page-container">
         <div class="breadcrumb">
-            <button onclick={() => goto('/confessions')} class="back-button">
+            <button on:click={handleBackButton} class="back-button">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                Back to Confessions
+                Back
             </button>
         </div>
         

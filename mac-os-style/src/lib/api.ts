@@ -108,6 +108,26 @@ export const confessionApi = {
     return response.json();
   },
 
+  // GET /confessions/search - Search confessions
+  async search(params: { 
+    q?: string; 
+    language?: string; 
+    tag?: string; 
+    limit?: number; 
+    offset?: number 
+  }): Promise<{ confessions: Confession[]; total: number }> {
+    const endpoint = buildUrl('/confessions/search', params);
+    const response = await apiFetch(endpoint);
+    const confessions = await response.json();
+    
+    // The API returns an array directly, not an object with confessions and total
+    // We need to wrap it in the expected format
+    return {
+      confessions: confessions || [],
+      total: confessions ? confessions.length : 0
+    };
+  },
+
   // POST /confessions/:id/upvote - Upvote a confession
   async upvote(id: number): Promise<void> {
     await apiFetch(`/confessions/${id}/upvote`, {

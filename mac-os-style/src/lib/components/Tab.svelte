@@ -10,16 +10,28 @@
     }
     const {children, icon, route = ""}: Props = $props();
     const path = $derived($page.url.pathname);
+    const fullUrl = $derived($page.url.pathname + $page.url.search);
 
     const isExternal = route.startsWith("http");
     const target = isExternal ? "_blank" : "";
     const rel = isExternal ? "noopener noreferer" : "";
 
-    const selected = $derived(path === route);
+    // Check for exact match including query parameters, or pathname-only match
+    const selected = $derived(() => {
+        if (isExternal) return false;
+        
+        // If route contains query parameters, match the full URL
+        if (route.includes('?')) {
+            return fullUrl === route;
+        }
+        
+        // Otherwise, just match the pathname
+        return path === route;
+    });
 </script>
 
 
-<a href={route} class="nav-tab" class:selected {target} {rel}>
+<a href={route} class="nav-tab" class:selected={selected()} {target} {rel}>
     <div class="tab-icon">{@render icon()}</div>
     <div class="tab-label">{@render children()}</div>
     {#if isExternal}

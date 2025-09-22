@@ -13,6 +13,8 @@
 
     import keybinds from "$lib/images/tabs/trending.webp";
     import mouse from "$lib/images/tabs/mouse.webp";
+    import sync from "$lib/images/tabs/sync.webp";
+    import ghost from "$lib/images/ghost.png";
 
 
 
@@ -21,6 +23,7 @@
 
     import config from "$lib/stores/config.svelte";
     import app from "$lib/stores/state.svelte";
+    import MobileCardLayout from "$lib/components/MobileCardLayout.svelte";
 
     const cssConfigVars = $derived.by(() => {
         let str = "";
@@ -294,6 +297,13 @@
                     <div class="window-dot maximize-btn" onclick={maximizeWindow}><span>{isMaximized ? '⧉' : '+'}</span></div>
                 </div>
             </div>
+            <!-- Mobile sidebar close button -->
+            <button class="mobile-sidebar-close" onclick={handleSidebarToggle} aria-label="Close sidebar" style="display: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
             <!-- Draggable title bar -->
             <div class="title-bar" onmousedown={startDrag}>
                 <button class="sidebar-toggle" onclick={handleSidebarToggle} aria-label="Toggle sidebar">
@@ -320,6 +330,10 @@
                 {#snippet icon()}<img src={window} alt="Categories" />{/snippet}
                 Categories
             </Tab>
+            <Tab route="/search">
+                {#snippet icon()}<img src={sync} alt="Search" />{/snippet}
+                Search
+            </Tab>
             <Gap />
             <Tab route="/confessions?filter=top">
                 {#snippet icon()}<img src={colors} alt="Top Confessions" />{/snippet}
@@ -334,7 +348,7 @@
                 Recent Posts
             </Tab>
             <Gap expand={true} />
-            <Tab route="https://github.com/Balaji01-4D/my-dear-bug">
+            <Tab route="https://github.com/Balaji01-4D/shit-happens">
                 {#snippet icon()}<div class="icon-wrapper github"><img src={github} alt="GitHub Repository" /></div>{/snippet}
                 GitHub
             </Tab>
@@ -363,18 +377,9 @@
 </div>
 
 <!-- Taskbar icon for minimized window -->
-<div class="taskbar-icon" class:visible={isMinimized} onclick={restoreFromTaskbar}>
+<div class="taskbar-icon" class:visible={isMinimized} onclick={restoreFromTaskbar} role="button" tabindex="0" aria-label="Restore window">
     <div class="taskbar-icon-content">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" fill="url(#gradient)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-            <path d="M8 12h8M12 8v8" stroke="white" stroke-width="2" stroke-linecap="round"/>
-            <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#667eea"/>
-                    <stop offset="100%" style="stop-color:#764ba2"/>
-                </linearGradient>
-            </defs>
-        </svg>
+        <img src={ghost} alt="Shit Happens" class="taskbar-ghost-icon" />
         <div class="taskbar-tooltip">Shit Happens</div>
     </div>
 </div>
@@ -447,6 +452,17 @@
     border-radius: 50%;
     border: 2px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.taskbar-ghost-icon {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+}
+
+.taskbar-icon:hover .taskbar-ghost-icon {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5)) brightness(1.1);
 }
 
 .taskbar-tooltip {
@@ -791,4 +807,57 @@
     height: 18px;
     width: 18px;
 }
+
+/* Mobile responsive overrides without touching desktop look */
+@media (max-width: 900px) {
+    :root { --app-width: 100vw; --app-height: 100dvh; --sidebar-width: 240px; }
+    .app-window {
+        position: fixed;
+        top: 0 !important; left: 0 !important; right: 0; bottom: 0;
+        width: 100vw !important; height: 100dvh !important;
+        max-width: none; max-height: none; min-width: 0; min-height: 0;
+        border-radius: 0; box-shadow: none; border: none;
+        flex-direction: column;
+    }
+    #sidebar { position: fixed; top: 0; left: 0; bottom: 0; height: auto; z-index: 3000; transform: translateX(0); width: 75vw; max-width: 320px; }
+    #sidebar.hidden { transform: translateX(-100%); width: 75vw; min-width: 0; max-width: 320px; }
+    #content-view { flex: 1; width: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .floating-sidebar-toggle { top: 12px; left: 12px; }
+    .title-bar { display: none; }
+    .sidebar-header { padding-top: 4px; position: relative; }
+    .sidebar-header .window-actions-container { display: none; }
+    
+    /* Mobile close button for sidebar */
+    .mobile-sidebar-close {
+        display: block !important;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(255,255,255,0.1);
+        border: none;
+        border-radius: 8px;
+        padding: 8px;
+        color: var(--font-color);
+        cursor: pointer;
+        z-index: 3001;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s ease;
+    }
+    
+    .mobile-sidebar-close:hover {
+        background-color: rgba(255,255,255,0.2);
+    }
+    .resize-handle, .taskbar-icon { display: none; }
+}
+
+@media (max-width: 900px) and (prefers-color-scheme: light) {
+    .app-window { background: rgba(250,250,250,0.75); }
+}
 </style>
+
+<!-- Mobile optimized layout overlay -->
+<MobileCardLayout />
